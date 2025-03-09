@@ -31,6 +31,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_online',
+        'activity_status',
     ];
 
     /**

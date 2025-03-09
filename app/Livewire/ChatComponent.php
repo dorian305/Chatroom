@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Events\MessageDeleted;
 use App\Events\NewMessage;
+use App\Events\UserActivity;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -29,12 +30,20 @@ class ChatComponent extends Component
         $this->message = "";
     }
 
-    public function deleteMessage($messageId)
+    public function deleteMessage(int $messageId)
     {
         if (!$messageId) return;
 
         MessageDeleted::dispatch(
             $messageId,
+        );
+    }
+
+    public function updateUserActivity(int $userId, string $activityStatus)
+    {
+        UserActivity::dispatch(
+            $userId,
+            $activityStatus,
         );
     }
 
@@ -57,11 +66,24 @@ class ChatComponent extends Component
         $this->dispatch('updated-messages');
     }
 
+    #[On('echo:chatroom,UserActivity')]
+    public function userActivityStatusUpdated($data)
+    {
+        $userId = $data['userId'];
+        $activityStatus = $data['activityStatus'];
+
+        $this->users = $this->users->map(function ($user) use ($userId, $activityStatus) {
+            if ($user->id === $userId) {
+                $user->activity_status = $activityStatus;
+            }
+
+            return $user;
+        });
+    }
+
     #[On('user-connected')]
     public function userConnected($userId)
     {
-        $this->updateUserStatus($userId, true);
-        
         $connectedUser = User::findOrFail($userId);
         $this->users = $this->users->push($connectedUser);
     }
@@ -72,6 +94,10 @@ class ChatComponent extends Component
         $this->updateUserStatus($userId, false);
 
         $disconnectedUser = User::findOrFail($userId);
+        $disconnectedUser->update([
+            'activity_status' => null,
+        ]);
+
         $this->users = $this->users->reject(fn ($user) => $user->id === $disconnectedUser->id);
     }
 
@@ -87,14 +113,16 @@ class ChatComponent extends Component
         $this->users = collect();
         $this->messages = collect();
 
+        UserActivity::dispatch(
+            auth()->user()->id,
+            'active',
+        );
         $this->updateUserStatus(auth()->user()->id, true);
 
         $this->users = User::with('messages')
             ->where('is_online', true)
             ->get()
-            ->reject(function ($user) {
-                return $user->id == auth()->user()->id;
-            })
+            ->reject(fn ($user) => $user->id == auth()->user()->id)
             ->prepend(auth()->user());
 
 

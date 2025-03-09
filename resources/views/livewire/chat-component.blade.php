@@ -2,17 +2,47 @@
     class="flex items-center justify-center"
 >
     <div class="w-full flex bg-gray-800 text-white rounded-lg overflow-hidden">
+		
         <!-- Users List -->
-        <aside class="w-1/4 p-4 border-r border-gray-700">
+        <aside class="w-[200px] p-4 border-r border-gray-700">
             <h2 class="text-xl font-semibold text-indigo-400 mb-4">Online users ({{ $users->count() }})</h2>
-            <ul class="space-y-2">
+            <ul
+				x-data="{
+					inactivityTime: 5000, // In milliseconds
+					userIsActive: true,
+					inactivityTimer: null,
+
+					resetInactivityTimer() {
+						this.userIsActive = true;
+
+						clearTimeout(this.inactivityTimer);
+						this.inactivityTimer = setTimeout(() => this.notifyInactivity(), this.inactivityTime);
+
+						$wire.updateUserActivity({{ auth()->user()->id }}, 'active');
+					},
+					notifyInactivity() {
+						this.userIsActive = false;
+						
+						$wire.updateUserActivity({{ auth()->user()->id }}, 'away');
+					},
+				}"
+				x-init="
+					$nextTick(() => {
+						resetInactivityTimer();
+						window.addEventListener('click', () => resetInactivityTimer());
+						window.addEventListener('keydown', () => resetInactivityTimer());
+						window.addEventListener('focus', () => resetInactivityTimer());
+					})
+				"
+				class="space-y-2"
+			>
                 @foreach ($users as $user)
                     <li
                         class="flex items-center p-2"
                         wire:key="{{ $user->id }}"
                     >
                         <!-- Green button -->
-                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2" title="Online"></span>
+                        <span class="w-2 h-2 bg-{{ $user->activity_status === 'active' ? 'green' : 'yellow' }}-500 rounded-full mr-2" title="Online"></span>
                         <span
                             wire:model="username"
                         >
