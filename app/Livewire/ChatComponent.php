@@ -53,6 +53,8 @@ class ChatComponent extends Component
         // This shit just fucking works and i dont know why.
         // Messages just get updated when event is fired.
         // If I comment out this method, then it doesn't work.
+
+        $this->dispatch('updated-messages');
     }
 
     #[On('user-connected')]

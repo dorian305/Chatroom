@@ -1,4 +1,6 @@
-<div class="flex items-center justify-center">
+<div
+    class="flex items-center justify-center"
+>
     <div class="w-full flex bg-gray-800 text-white rounded-lg overflow-hidden">
         <!-- Users List -->
         <aside class="w-1/4 p-4 border-r border-gray-700">
@@ -31,47 +33,55 @@
                 id="messages-container"
                 style="height: 500px"
                 x-data="{
-                    userViewingOlderMessages: false,
-
                     scrollToLatestMessage() {
                         $nextTick(() => $el.scrollTop = $el.scrollHeight);
                     },
                     updateTime() {
-                        const now = new Date();
-                        const diffInSeconds = Math.floor((now - this.createdAt) / 1000);
-                        const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+                        $nextTick(() => {
+                            const messages = document.querySelectorAll('.message-elem');
 
-                        if (diffInSeconds < 30) {
-                            this.timeAgo = 'now';
-                        } else if (diffInSeconds < 60) {
-                            this.timeAgo = 'a moment ago';
-                        } else if (diffInSeconds < 3600) {
-                            this.timeAgo = rtf.format(-Math.floor(diffInSeconds / 60), 'minutes');
-                        } else if (diffInSeconds < 86400) {
-                            this.timeAgo = rtf.format(-Math.floor(diffInSeconds / 3600), 'hours');
-                        } else {
-                            this.timeAgo = rtf.format(-Math.floor(diffInSeconds / 86400), 'days');
-                        }
-                    },
+                            for (const message of messages) {
+                                const dateElem = message.querySelector('.date-elem');
+                                const createdAt = new Date(dateElem.getAttribute('data-created-at'));
+                                const now = new Date();
+                                const diffInSeconds = Math.floor((now - createdAt) / 1000);
+                                let timeAgo = '';
+
+                                if (diffInSeconds < 10) {
+                                    timeAgo = 'now';
+                                } else if (diffInSeconds < 60) {
+                                    timeAgo = 'a moment ago';
+                                } else if (diffInSeconds < 3600) {
+                                    const minutes = Math.floor(diffInSeconds / 60);
+                                    timeAgo = minutes === 1 ? 'a minute ago' : `${minutes} minutes ago`;
+                                } else if (diffInSeconds < 86400) {
+                                    const hours = Math.floor(diffInSeconds / 3600);
+                                    timeAgo = hours === 1 ? 'an hour ago' : `${hours} hours ago`;
+                                } else {
+                                    const days = Math.floor(diffInSeconds / 86400);
+                                    timeAgo = days === 1 ? 'a day ago' : `${days} days ago`;
+                                }
+
+                                dateElem.textContent = timeAgo;
+                            }
+                        });
+                    }
                 }"
-                @updated-messages.window="scrollToLatestMessage();"
-                x-init="scrollToLatestMessage();"
+                x-init="
+                    scrollToLatestMessage();
+                    updateTime();
+                    setInterval(() => {
+                        updateTime();
+                    }, 1000);
+                "
+                @updated-messages.window="
+                    scrollToLatestMessage();
+                    updateTime();
+                "
             >
                 @foreach ($messages as $message)
                     <div
-                        class="p-3 w-full rounded-md relative {{ $message->user->id === auth()->user()->id ? 'bg-gray-700 text-left' : 'text-right' }}"
-                        x-data="{
-                            updateInterval: null,
-                            timeAgo: '',
-                            createdAt: new Date('{{ $message->created_at->toISOString() }}'),
-                        }"
-                        x-init="
-                            updateTime();
-                            updateInterval = setInterval(() => {
-                                updateTime();
-                                console.log('updated-time');
-                            }, 1000);
-                        "
+                        class="message-elem p-3 w-full rounded-md relative {{ $message->user->id === auth()->user()->id ? 'bg-gray-700 text-left' : 'text-right' }}"
                     >
                         @if ($message->user->id === auth()->user()->id)
                             <!-- Delete Button -->
@@ -85,7 +95,11 @@
                         @endif
                         <p class="text-sm text-gray-400">{{ $message->user->name }}</p>
                         <p>{{ $message->content }}</p>
-                        <p class="text-xs text-gray-300" id="message-date-elem"></p>
+                        <p
+                            class="date-elem text-xs text-gray-300"
+                            data-created-at="{{ $message->created_at->toISOString() }}"
+                            wire:ignore
+                        ></p>
                     </div>
                 @endforeach
             </div>
