@@ -8,7 +8,7 @@
             <h2 class="text-xl font-semibold text-indigo-400 mb-4">Online users ({{ $users->count() }})</h2>
             <ul
 				x-data="{
-					inactivityTime: 5000, // In milliseconds
+					inactivityTime: 60000, // In milliseconds
 					userIsActive: true,
 					inactivityTimer: null,
 
@@ -55,7 +55,40 @@
 
 
         <!-- Chatbox -->
-        <section class="flex-1 flex flex-col">
+        <section
+            class="flex-1 flex flex-col relative"
+            x-data="{
+                userIsViewingOldMessages: false,
+            }"
+        >
+            
+            <!-- Notification for when you're looking at old messages -->
+            <div
+                x-show="userIsViewingOldMessages"
+                x-transition:enter="transition ease-out duration-100"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-100"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="absolute z-10 top-0 left-0 w-full bg-gray-500 bg-opacity-50 text-center py-2 text-sm"
+            >
+                You are viewing older messages.
+                <span
+                    class="text-blue-500 hover:text-blue-700 underline cursor-pointer font-semibold"
+                    x-on:click="
+                        const container = document.querySelector('#messages-container');
+                        container.scrollTo({
+                            top: container.scrollHeight,
+                            behavior: 'smooth',
+                        });
+                        userIsViewingOldMessages = false;
+                    "
+                >
+                    Scroll down
+                </span>
+                to view latest messages.
+            </div>
 
             <!-- Messages -->
             <div
@@ -63,6 +96,8 @@
                 id="messages-container"
                 style="height: 500px"
                 x-data="{
+                    offsetWhichTriggersNotificationDivAboutViewingOlderMessages: 100,
+
                     scrollToLatestMessage() {
                         $nextTick(() => $el.scrollTop = $el.scrollHeight);
                     },
@@ -104,6 +139,7 @@
                         updateTime();
                     }, 1000);
                 "
+                x-on:scroll="userIsViewingOldMessages = $el.scrollTop + $el.clientHeight + offsetWhichTriggersNotificationDivAboutViewingOlderMessages < $el.scrollHeight;"
                 @updated-messages.window="
                     scrollToLatestMessage();
                     updateTime();
