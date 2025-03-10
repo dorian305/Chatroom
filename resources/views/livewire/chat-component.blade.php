@@ -42,7 +42,11 @@
                         wire:key="{{ $user->id }}"
                     >
                         <!-- Green button -->
-                        <span class="w-2 h-2 bg-{{ $user->activity_status === 'active' ? 'green' : 'yellow' }}-500 rounded-full mr-2" title="Online"></span>
+                        <span
+                            class="w-2 h-2 rounded-full mr-2"
+                            title="{{ $user->activity_status }}"
+                            style="background-color: {{ $user->activity_status === 'active' ? 'rgb(34, 197, 94)' : 'rgb(254, 240, 138)' }};"
+                        ></span>
                         <span
                             wire:model="username"
                         >
