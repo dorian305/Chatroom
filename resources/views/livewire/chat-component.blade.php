@@ -96,9 +96,8 @@
 
             <!-- Messages -->
             <div
-                class="p-4 overflow-y-auto space-y-4"
+                class="p-4 overflow-y-auto space-y-4 h-[500px]"
                 id="messages-container"
-                style="height: 500px"
                 x-data="{
                     offsetWhichTriggersNotificationDivAboutViewingOlderMessages: 100,
 
@@ -174,22 +173,44 @@
                 @endforeach
             </div>
 
-            <div class="p-4 border-t border-gray-700 flex items-center">
+            <div class="px-4 py-6 border-t border-gray-700 flex items-center relative">
                 <input
                     type="text"
-                    class="flex-1 p-3 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-gray-400"
+                    class="flex-1 p-3 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-gray-200"
                     placeholder="Type a message..."
                     wire:keydown.enter="sendMessage"
+                    wire:input.debounce="typing('{{ auth()->user()->name }}', true)"
                     wire:model="message"
+                    x-data="{
+                        userTyping: false,
+                        typingTimeoutTime: 5000,
+                        typingTimeoutHandler: null,
+                    }"
+                    x-on:keydown="
+                        clearTimeout(typingTimeoutHandler);
+                        typingTimeoutHandler = setTimeout(() => {
+                            $wire.typing('{{ auth()->user()->name }}', false);
+                        }, typingTimeoutTime)
+                    "
                 >
                 <button
                     class="ml-3 bg-indigo-500 hover:bg-indigo-600 px-4 py-2 rounded-lg"
                     wire:click="sendMessage"
                 >Send</button>
             </div>
-            <div id="is-typing">
-                
+            <div
+                id="is-typing"
+                class="absolute z-10 bottom-0 left-0 w-full px-6 py-1 text-xs text-gray-400 flex"
+                wire:model="usersCurrentlyTyping"
+            >
+                @php
+                    $usersTyping = array_filter($usersCurrentlyTyping, fn ($user) => $user !== auth()->user()->name);
+                @endphp
+                @if (count($usersTyping) > 0)
+                    <span>{{ implode(',', $usersCurrentlyTyping) }} typing...</span>
+                @endif
             </div>
+
         </section>
     </div>
     <livewire:toast-notification-component></livewire:toast-notification-component>

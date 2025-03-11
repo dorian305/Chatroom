@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Events\MessageDeleted;
 use App\Events\NewMessage;
 use App\Events\UserActivity;
+use App\Events\UserTyping;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Collection;
@@ -15,6 +16,7 @@ class ChatComponent extends Component
 {
     public string $message = "";
     public string $username = "";
+    public array $usersCurrentlyTyping = [];
     public Collection $users;
     public Collection $messages;
 
@@ -44,6 +46,14 @@ class ChatComponent extends Component
         UserActivity::dispatch(
             $userId,
             $activityStatus,
+        );
+    }
+
+    public function typing(string $username, bool $isTyping)
+    {
+        UserTyping::dispatch(
+            $username,
+            $isTyping,
         );
     }
 
@@ -79,6 +89,27 @@ class ChatComponent extends Component
 
             return $user;
         });
+    }
+
+    #[On('echo:chatroom,UserTyping')]
+    public function userIsTyping($data)
+    {
+        $username = $data['username'];
+        $isTyping = $data['isTyping'];
+
+        // Add typing user to the array.
+        if ($isTyping && !in_array($username, $this->usersCurrentlyTyping)) {
+            $this->usersCurrentlyTyping[] = $username;
+
+            return;
+        }
+
+        // Remove typing user from the array.
+        if (!$isTyping && in_array($username, $this->usersCurrentlyTyping)) {
+            $key = array_search($username, $this->usersCurrentlyTyping);
+            unset($this->usersCurrentlyTyping[$key]);
+            $this->usersCurrentlyTyping = array_values($this->usersCurrentlyTyping);
+        }
     }
 
     #[On('user-connected')]
