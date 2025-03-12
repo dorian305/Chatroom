@@ -1,39 +1,34 @@
 <div
     class="flex items-center justify-center"
+    x-data="{
+        inactivityTime: 1000,
+        activityStatus: 'active',
+        inactivityTimer: null,
+
+        resetInactivityTimer() {
+            if (this.activityStatus !== 'active') {
+                this.updateUserActivity('active');
+            }
+
+            clearTimeout(this.inactivityTimer);
+            this.inactivityTimer = setTimeout(() => this.notifyInactivity(), this.inactivityTime);
+        },
+        notifyInactivity() {
+            this.updateUserActivity('away');
+        },
+        updateUserActivity(status) {
+            this.activityStatus = status;
+            $wire.updateUserActivity({{ auth()->user()->id }}, this.activityStatus);
+        },
+    }"
+    x-init="resetInactivityTimer()"
 >
     <div class="w-full flex bg-gray-800 text-white rounded-lg overflow-hidden">
 		
         <!-- Users List -->
         <aside class="w-[200px] p-4 border-r border-gray-700">
             <h2 class="text-xl font-semibold text-indigo-400 mb-4">Online users ({{ $users->count() }})</h2>
-            <ul
-				x-data="{
-					inactivityTime: 60000,
-					userIsActive: true,
-					inactivityTimer: null,
-
-					resetInactivityTimer() {
-                        if (!this.userIsActive) {
-                            this.userIsActive = true;
-                            $wire.updateUserActivity({{ auth()->user()->id }}, 'active');
-                        }
-
-						clearTimeout(this.inactivityTimer);
-						this.inactivityTimer = setTimeout(() => this.notifyInactivity(), this.inactivityTime);
-					},
-					notifyInactivity() {
-						this.userIsActive = false;
-						$wire.updateUserActivity({{ auth()->user()->id }}, 'away');
-					},
-				}"
-				x-init="
-					$nextTick(() => {
-						resetInactivityTimer();
-						window.addEventListener('keydown', () => resetInactivityTimer());
-					});
-				"
-				class="space-y-2"
-			>
+            <ul class="space-y-2">
                 @foreach ($users as $user)
                     <li
                         class="flex items-center p-2"
@@ -45,9 +40,7 @@
                             title="{{ $user->activity_status }}"
                             style="background-color: {{ $user->activity_status === 'active' ? 'rgb(34, 197, 94)' : 'rgb(254, 240, 138)' }};"
                         ></span>
-                        <span
-                            wire:model="username"
-                        >
+                        <span wire:model="username">
                             {{ $user->name }}
                         </span>
                     </li>
@@ -204,6 +197,8 @@
                         }
 
                         resetTimeoutOnInput();
+                        resetInactivityTimer();
+                        
                     "
                     x-on:keydown.enter="
                         if (userTyping) {
