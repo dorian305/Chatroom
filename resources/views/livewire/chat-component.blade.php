@@ -8,31 +8,29 @@
             <h2 class="text-xl font-semibold text-indigo-400 mb-4">Online users ({{ $users->count() }})</h2>
             <ul
 				x-data="{
-					inactivityTime: 60000, // In milliseconds
+					inactivityTime: 60000,
 					userIsActive: true,
 					inactivityTimer: null,
 
 					resetInactivityTimer() {
-						this.userIsActive = true;
+                        if (!this.userIsActive) {
+                            this.userIsActive = true;
+                            $wire.updateUserActivity({{ auth()->user()->id }}, 'active');
+                        }
 
 						clearTimeout(this.inactivityTimer);
 						this.inactivityTimer = setTimeout(() => this.notifyInactivity(), this.inactivityTime);
-
-						$wire.updateUserActivity({{ auth()->user()->id }}, 'active');
 					},
 					notifyInactivity() {
 						this.userIsActive = false;
-						
 						$wire.updateUserActivity({{ auth()->user()->id }}, 'away');
 					},
 				}"
 				x-init="
 					$nextTick(() => {
 						resetInactivityTimer();
-						window.addEventListener('click', () => resetInactivityTimer());
 						window.addEventListener('keydown', () => resetInactivityTimer());
-						window.addEventListener('focus', () => resetInactivityTimer());
-					})
+					});
 				"
 				class="space-y-2"
 			>
@@ -178,19 +176,41 @@
                     type="text"
                     class="flex-1 p-3 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 text-gray-200"
                     placeholder="Type a message..."
-                    wire:keydown.enter="sendMessage"
-                    wire:input.debounce="typing('{{ auth()->user()->name }}', true)"
                     wire:model="message"
                     x-data="{
                         userTyping: false,
-                        typingTimeoutTime: 5000,
+                        typingTimeoutTime: 1000,
                         typingTimeoutHandler: null,
+
+                        resetTimeoutOnInput() {
+                            clearTimeout(this.typingTimeoutHandler);
+                            this.typingTimeoutHandler = setTimeout(() => this.updateUserNotTyping(), this.typingTimeoutTime)
+                        },
+                        updateUserTyping() {
+                            this.userTyping = true;
+                            $wire.typing('{{ auth()->user()->name }}', true);
+                        },
+                        updateUserNotTyping() {
+                            this.userTyping = false;
+                            $wire.typing('{{ auth()->user()->name }}', false);
+                        },
+                        sendMessage() {
+                            $wire.sendMessage();
+                        }
                     }"
                     x-on:keydown="
-                        clearTimeout(typingTimeoutHandler);
-                        typingTimeoutHandler = setTimeout(() => {
-                            $wire.typing('{{ auth()->user()->name }}', false);
-                        }, typingTimeoutTime)
+                        if (!userTyping) {
+                            updateUserTyping();
+                        }
+
+                        resetTimeoutOnInput();
+                    "
+                    x-on:keydown.enter="
+                        if (userTyping) {
+                            updateUserNotTyping()
+                        }
+
+                        sendMessage();
                     "
                 >
                 <button
@@ -204,10 +224,14 @@
                 wire:model="usersCurrentlyTyping"
             >
                 @php
-                    $usersTyping = array_filter($usersCurrentlyTyping, fn ($user) => $user !== auth()->user()->name);
+                    // Filter out the local user's name and re-index the array
+                    $usersTyping = array_filter($usersCurrentlyTyping, fn ($user) =>
+                        $user !== auth()->user()->name
+                    );
+                    $usersTyping = array_values($usersTyping);
                 @endphp
                 @if (count($usersTyping) > 0)
-                    <span>{{ implode(',', $usersCurrentlyTyping) }} typing...</span>
+                    <span>{{ implode(', ', $usersTyping) }} typing...</span>
                 @endif
             </div>
 
