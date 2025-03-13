@@ -19,13 +19,14 @@ class ChatComponent extends Component
     public array $usersCurrentlyTyping = [];
     public Collection $users;
     public Collection $messages;
+    public User $localUser;
 
     public function sendMessage()
     {
         if (!trim($this->message)) return;
 
         NewMessage::dispatch(
-            auth()->user()->id,
+            $this->localUser->id,
             $this->message,
         );
 
@@ -143,23 +144,25 @@ class ChatComponent extends Component
     {
         $this->users = collect();
         $this->messages = collect();
+        $this->localUser = auth()->user();
 
         UserActivity::dispatch(
-            auth()->user()->id,
+            $this->localUser->id,
             'active',
         );
-        $this->updateUserStatus(auth()->user()->id, true);
+
+        $this->updateUserStatus($this->localUser->id, true);
 
         $this->users = User::with('messages')
             ->where('is_online', true)
             ->get()
-            ->reject(fn ($user) => $user->id == auth()->user()->id)
-            ->prepend(auth()->user());
-
-
+            ->reject(fn ($user) => $user->id == $this->localUser->id)
+            ->prepend($this->localUser);
         $this->messages = Message::with('user')
             ->where('is_deleted', '=', false)
             ->get();
+
+        $this->dispatch('messages-loaded');
     }
 
     public function render()
