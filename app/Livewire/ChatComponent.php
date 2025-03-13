@@ -161,8 +161,6 @@ class ChatComponent extends Component
         $this->messages = Message::with('user')
             ->where('is_deleted', '=', false)
             ->get();
-
-        $this->dispatch('messages-loaded');
     }
 
     public function render()
