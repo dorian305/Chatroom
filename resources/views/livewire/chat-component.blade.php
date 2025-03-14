@@ -213,14 +213,18 @@
             >
                 @php
                     // Filter out the local user's name and re-index the array
-                    $usersTyping = array_filter($usersCurrentlyTyping, fn ($user) =>
-                        $user !== auth()->user()->name
-                    );
-                    $usersTyping = array_values($usersTyping);
+                    $usersTyping = array_values(array_filter($usersCurrentlyTyping, fn ($user) => $user !== auth()->user()->name));
+                    $typingCount = count($usersTyping);
                 @endphp
-                @if (count($usersTyping) > 0)
-                    <span>{{ implode(', ', $usersTyping) }} typing...</span>
+
+                @if ($typingCount === 1)
+                    <span>{{ $usersTyping[0] }} is typing...</span>
+                @elseif ($typingCount === 2)
+                    <span>{{ $usersTyping[0] }} and {{ $usersTyping[1] }} are typing...</span>
+                @elseif ($typingCount > 2)
+                    <span>Multiple people are typing...</span>
                 @endif
+
             </div>
         </section>
 
