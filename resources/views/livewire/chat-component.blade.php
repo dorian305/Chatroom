@@ -152,14 +152,14 @@
                             >
                             <div class="">
                                 <div class="flex flex-row items-center">
-                                    <p class="text-base text-gray-400">{{ $message->user->name }}</p>
+                                    <p class="text-base">{{ $message->user->name }}</p>
                                     <p
-                                        class="date-elem text-xs text-gray-300 mx-2"
+                                        class="date-elem text-xs text-gray-600 mx-2"
                                         data-created-at="{{ $message->created_at->toISOString() }}"
                                         wire:ignore
                                     ></p>
                                 </div>
-                                <p>{{ $message->content }}</p>
+                                <p class="text-gray-300">{{ $message->content }}</p>
                             </div>
                         </div>
                     @endforeach
@@ -227,11 +227,17 @@
                 @endphp
 
                 @if ($typingCount === 1)
-                    <span>{{ $usersTyping[0] }} is typing...</span>
+                    <span>
+                        <strong>{{ $usersTyping[0] }}</strong> is typing...
+                    </span>
                 @elseif ($typingCount === 2)
-                    <span>{{ $usersTyping[0] }} and {{ $usersTyping[1] }} are typing...</span>
+                    <span>
+                        <strong>{{ $usersTyping[0] }}</strong> and <strong>{{ $usersTyping[1] }}</strong> are typing...
+                    </span>
                 @elseif ($typingCount > 2)
-                    <span>Multiple people are typing...</span>
+                    <span>
+                        Multiple people are typing...
+                    </span>
                 @endif
             </div>
         </section>
