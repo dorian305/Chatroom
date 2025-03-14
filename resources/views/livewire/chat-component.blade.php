@@ -55,9 +55,13 @@
             x-data="{
                 isViewingOldMessages: false,
                 scrollOffsetThreshold: 100,
+                messagesContainer: document.querySelector('#messages-container'),
 
-                checkIfViewingOldMessages(messageContainer) {
-                    this.isViewingOldMessages = messageContainer.scrollTop + messageContainer.clientHeight + this.scrollOffsetThreshold < messageContainer.scrollHeight;
+                checkIfViewingOldMessages() {
+                    this.isViewingOldMessages = 
+                        this.messagesContainer.scrollTop
+                        + this.messagesContainer.clientHeight
+                        + this.scrollOffsetThreshold < this.messagesContainer.scrollHeight;
                 },
             }"
         >
@@ -77,9 +81,8 @@
                 <span
                     class="text-blue-500 hover:text-blue-700 underline cursor-pointer font-semibold"
                     x-on:click="
-                        const container = document.querySelector('#messages-container');
-                        container.scrollTo({
-                            top: container.scrollHeight,
+                        messagesContainer.scrollTo({
+                            top: messagesContainer.scrollHeight,
                             behavior: 'smooth',
                         });
                         isViewingOldMessages = false;
@@ -160,6 +163,7 @@
                                 class="text-xs absolute top-2 right-2 text-gray-400 hover:text-gray-200 rounded-sm hover:bg-gray-600 p-1"
                                 title="Delete message"
                                 wire:click="deleteMessage({{ $message->id }})"
+                                x-on:click="checkIfViewingOldMessages()"
                             >
                                 X
                             </button>
