@@ -72,4 +72,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class);
     }
+
+    public function getDefaultProfilePictureUrl(): string
+    {
+        return $this->defaultProfilePhotoUrl();
+    }
 }

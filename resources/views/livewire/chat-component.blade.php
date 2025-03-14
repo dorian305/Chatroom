@@ -132,7 +132,7 @@
                 >
                     @foreach ($messages as $message)
                         <div
-                            class="message-elem p-3 w-full rounded-md relative"
+                            class="flex flex-row items-start message-elem pb-4 w-full rounded-md relative"
                         >
                             @if ($message->user->id === auth()->user()->id)
                                 <!-- Delete Button -->
@@ -145,13 +145,20 @@
                                     X
                                 </button>
                             @endif
-                            <p class="text-sm text-gray-400">{{ $message->user->name }}</p>
-                            <p>{{ $message->content }}</p>
-                            <p
-                                class="date-elem text-xs text-gray-300"
-                                data-created-at="{{ $message->created_at->toISOString() }}"
-                                wire:ignore
-                            ></p>
+                            <img
+                                class="size-8 rounded-full object-cover mx-4"
+                                src="{{ $message->user->profile_photo_path ? Storage::url($message->user->profile_photo_path) : $message->user->getDefaultProfilePictureUrl() }}"
+                                alt=""
+                            >
+                            <div class="">
+                                <p class="text-sm text-gray-400">{{ $message->user->name }}</p>
+                                <p>{{ $message->content }}</p>
+                                <p
+                                    class="date-elem text-xs text-gray-300"
+                                    data-created-at="{{ $message->created_at->toISOString() }}"
+                                    wire:ignore
+                                ></p>
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -165,7 +172,7 @@
                     wire:model="message"
                     x-data="{
                         userTyping: false,
-                        typingTimeoutTime: 1000,
+                        typingTimeoutTime: 5000,
                         typingTimeoutHandler: null,
 
                         resetTimeoutOnInput() {
@@ -224,7 +231,6 @@
                 @elseif ($typingCount > 2)
                     <span>Multiple people are typing...</span>
                 @endif
-
             </div>
         </section>
 
@@ -237,15 +243,21 @@
                         class="flex items-center py-2"
                         wire:key="{{ $user->id }}"
                     >
-                        <!-- Green button -->
-                        <span
-                            class="w-2 h-2 rounded-full mr-2"
-                            title="{{ $user->activity_status }}"
-                            style="background-color: {{ $user->activity_status === 'active' ? 'rgb(34, 197, 94)' : 'rgb(254, 240, 138)' }};"
-                        ></span>
+                        <img
+                            class="size-8 rounded-full object-cover m-2"
+                            src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : $user->getDefaultProfilePictureUrl() }}"
+                            alt=""
+                        >
                         <span wire:model="username">
                             {{ $user->name }}
                         </span>
+
+                        <!-- Green button -->
+                        <span
+                            class="w-2 h-2 rounded-full ml-2"
+                            title="{{ $user->activity_status }}"
+                            style="background-color: {{ $user->activity_status === 'active' ? 'rgb(34, 197, 94)' : 'rgb(254, 240, 138)' }};"
+                        ></span>
                     </li>
                 @endforeach
             </ul>
