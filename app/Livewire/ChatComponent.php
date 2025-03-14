@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Events\MessageDeleted;
+use App\Events\DeleteMessage;
 use App\Events\NewMessage;
 use App\Events\UserActivity;
 use App\Events\UserTyping;
@@ -37,7 +37,7 @@ class ChatComponent extends Component
     {
         if (!$messageId) return;
 
-        MessageDeleted::dispatch(
+        DeleteMessage::dispatch(
             $messageId,
         );
     }
@@ -67,14 +67,12 @@ class ChatComponent extends Component
         $this->dispatch('updated-messages');
     }
 
-    #[On('echo:chatroom,MessageDeleted')]
+    #[On('echo:chatroom,DeleteMessage')]
     public function deletedMessage()
     {
         // This shit just fucking works and i dont know why.
         // Messages just get updated when event is fired.
         // If I comment out this method, then it doesn't work.
-
-        $this->dispatch('updated-messages');
     }
 
     #[On('echo:chatroom,UserActivity')]
