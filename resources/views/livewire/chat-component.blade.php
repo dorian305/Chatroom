@@ -184,7 +184,7 @@
                             $wire.sendMessage();
                         }
                     }"
-                    x-on:keydown="
+                    x-on:input="
                         if (!userTyping) {
                             updateUserTyping();
                         }
