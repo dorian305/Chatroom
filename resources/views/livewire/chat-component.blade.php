@@ -109,7 +109,7 @@
                                         timeAgo = days === 1 ? 'a day ago' : `${days} days ago`;
                                     }
 
-                                    dateElem.textContent = timeAgo;
+                                    dateElem.textContent = `(${timeAgo})`;
                                 }
                             });
                         }
@@ -151,13 +151,15 @@
                                 alt=""
                             >
                             <div class="">
-                                <p class="text-sm text-gray-400">{{ $message->user->name }}</p>
+                                <div class="flex flex-row items-center">
+                                    <p class="text-base text-gray-400">{{ $message->user->name }}</p>
+                                    <p
+                                        class="date-elem text-xs text-gray-300 mx-2"
+                                        data-created-at="{{ $message->created_at->toISOString() }}"
+                                        wire:ignore
+                                    ></p>
+                                </div>
                                 <p>{{ $message->content }}</p>
-                                <p
-                                    class="date-elem text-xs text-gray-300"
-                                    data-created-at="{{ $message->created_at->toISOString() }}"
-                                    wire:ignore
-                                ></p>
                             </div>
                         </div>
                     @endforeach
