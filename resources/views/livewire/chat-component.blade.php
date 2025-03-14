@@ -248,17 +248,19 @@
             <ul class="">
                 @foreach ($users as $user)
                     <li
-                        class="flex items-center py-2"
+                        class="flex items-center justify-between py-2"
                         wire:key="{{ $user->id }}"
                     >
-                        <img
-                            class="size-8 rounded-full object-cover m-2"
-                            src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : $user->getDefaultProfilePictureUrl() }}"
-                            alt=""
-                        >
-                        <span wire:model="username">
-                            {{ $user->name }}
-                        </span>
+                        <div class="flex flex-row items-center">
+                            <img
+                                class="size-8 rounded-full object-cover m-2"
+                                src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : $user->getDefaultProfilePictureUrl() }}"
+                                alt=""
+                            >
+                            <span wire:model="username">
+                                {{ $user->name }}
+                            </span>
+                        </div>
 
                         <!-- Green button -->
                         <span
