@@ -133,6 +133,7 @@
                     @foreach ($messages as $message)
                         <div
                             class="flex flex-row items-start message-elem py-4 w-full rounded-md relative hover:bg-gray-700 hover:bg-opacity-20"
+                            wire:key="{{ $message->id }}"
                             x-data="{
                                 mouseOverMessage: false,
                                 messageUserId: {{ $message->user->id }}
