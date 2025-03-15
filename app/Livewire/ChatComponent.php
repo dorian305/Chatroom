@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Events\DeleteMessage;
+use App\Events\EditMessage;
 use App\Events\NewMessage;
 use App\Events\UserActivity;
 use App\Events\UserTyping;
@@ -21,7 +22,7 @@ class ChatComponent extends Component
     public Collection $messages;
     public User $localUser;
 
-    public function sendMessage()
+    public function sendMessage(): void
     {
         if (!trim($this->message)) return;
 
@@ -33,7 +34,7 @@ class ChatComponent extends Component
         $this->message = "";
     }
 
-    public function deleteMessage(int $messageId)
+    public function deleteMessage(int $messageId): void
     {
         if (!$messageId) return;
 
@@ -42,7 +43,17 @@ class ChatComponent extends Component
         );
     }
 
-    public function updateUserActivity(int $userId, string $activityStatus)
+    public function editMessage(int $messageId, string $oldContent, string $updatedContent): void
+    {
+        if ($oldContent === $updatedContent) return;
+
+        EditMessage::dispatch(
+            $messageId,
+            $updatedContent,
+        );
+    }
+
+    public function updateUserActivity(int $userId, string $activityStatus): void
     {
         UserActivity::dispatch(
             $userId,
@@ -50,7 +61,7 @@ class ChatComponent extends Component
         );
     }
 
-    public function typing(string $username, bool $isTyping)
+    public function typing(string $username, bool $isTyping): void
     {
         UserTyping::dispatch(
             $username,
@@ -59,7 +70,7 @@ class ChatComponent extends Component
     }
 
     #[On('echo:chatroom,NewMessage')]
-    public function newMessageReceived($data)
+    public function newMessageReceived($data): void
     {
         $message = Message::findOrFail($data['message']['id']);
 
@@ -68,15 +79,31 @@ class ChatComponent extends Component
     }
 
     #[On('echo:chatroom,DeleteMessage')]
-    public function deletedMessage()
+    public function deletedMessage($data): void
     {
         // This shit just fucking works and i dont know why.
         // Messages just get updated when event is fired.
         // If I comment out this method, then it doesn't work.
     }
 
+    #[On('echo:chatroom,EditMessage')]
+    public function editedMessage($data): void
+    {
+        $messageId = $data['messageId'];
+        $updatedContent = $data['updatedContent'];
+
+        $this->messages = $this->messages
+            ->map(function ($message) use ($messageId, $updatedContent) {
+                if ($message->id === $messageId) {
+                    $message->content = $updatedContent;
+                }
+
+                return $message;
+            });
+    }
+
     #[On('echo:chatroom,UserActivity')]
-    public function userActivityStatusUpdated($data)
+    public function userActivityStatusUpdated($data): void
     {
         $userId = $data['userId'];
         $activityStatus = $data['activityStatus'];
@@ -91,7 +118,7 @@ class ChatComponent extends Component
     }
 
     #[On('echo:chatroom,UserTyping')]
-    public function userIsTyping($data)
+    public function userIsTyping($data): void
     {
         $username = $data['username'];
         $isTyping = $data['isTyping'];
@@ -119,7 +146,7 @@ class ChatComponent extends Component
     }
 
     #[On('user-disconnected')]
-    public function userDisconnected($userId)
+    public function userDisconnected($userId): void
     {
         $this->updateUserStatus($userId, false);
 
@@ -131,14 +158,14 @@ class ChatComponent extends Component
         $this->users = $this->users->reject(fn ($user) => $user->id === $disconnectedUser->id);
     }
 
-    public function updateUserStatus(int $userId, bool $online)
+    public function updateUserStatus(int $userId, bool $online): void
     {
         User::findOrFail($userId)->update([
             'is_online' => $online,
         ]);
     }
 
-    public function mount()
+    public function mount(): void
     {
         $this->users = collect();
         $this->messages = collect();

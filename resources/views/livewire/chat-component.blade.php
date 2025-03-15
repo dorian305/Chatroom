@@ -136,7 +136,15 @@
                             wire:key="{{ $message->id }}"
                             x-data="{
                                 mouseOverMessage: false,
-                                messageUserId: {{ $message->user->id }}
+                                messageUserId: {{ $message->user->id }},
+                                messageContent: '{{ $message->content }}',
+                                messageEditedContent: '{{ $message->content }}',
+                                isBeingEdited: false,
+
+                                toggleEditMode() {
+                                    this.isBeingEdited = true;
+                                    this.$nextTick(() => this.$refs.editInput.focus());
+                                },
                             }"
                             @mouseenter="
                                 if (messageUserId === {{ auth()->user()->id }}) {
@@ -155,7 +163,8 @@
                                     <button
                                         class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
                                         title="Edit message"
-                                        wire:click="editMessage({{ $message->id }})"
+                                        x-on:click="toggleEditMode()"
+                                        x-show="!isBeingEdited"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-3">
                                             <path
@@ -191,16 +200,64 @@
                                 src="{{ $message->user->profile_photo_path ? Storage::url($message->user->profile_photo_path) : $message->user->getDefaultProfilePictureUrl() }}"
                                 alt=""
                             >
-                            <div class="">
+                            <div class="w-4/5">
                                 <div class="flex flex-row items-center">
                                     <p class="text-base">{{ $message->user->name }}</p>
                                     <p
-                                        class="date-elem text-xs text-gray-600 mx-2"
+                                        class="date-elem text-xs text-gray-400 mx-2"
                                         data-created-at="{{ $message->created_at->toISOString() }}"
                                         wire:ignore
                                     ></p>
                                 </div>
-                                <p class="text-gray-300">{{ $message->content }}</p>
+
+                                <!-- Message content -->
+                                <div x-show="!isBeingEdited">
+                                    <p class="text-gray-300">
+                                        {{ $message->content }}
+                                        
+                                        @if ($message->is_edited)
+                                            <span class="text-sm text-gray-600">
+                                                (edited)
+                                            </span>
+                                        @endif
+                                    </p>
+                                </div>
+
+                                <!-- Edit message mode -->
+                                <div
+                                    class="space-y-2"
+                                    x-show="isBeingEdited"
+                                >
+                                    <input
+                                        type="text"
+                                        class="w-full p-2 border-0 rounded text-gray-200 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        x-model="messageEditedContent"
+                                        x-ref="editInput"
+                                    >
+                                    <div class="flex flex-row space-x-2">
+                                        <button
+                                            class="w-20 p-1 rounded focus:outline-none bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
+                                            @click="
+                                                isBeingEdited = false;
+                                                
+                                                if (messageContent !== messageEditedContent) {
+                                                    $wire.editMessage({{ $message->id }}, messageContent, messageEditedContent);
+                                                }
+                                            "
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            class="w-20 p-1 rounded focus:outline-none bg-gray-500 hover:bg-gray-400 focus:bg-gray-400"
+                                            @click="
+                                                isBeingEdited = false;
+                                                messageEditedContent = messageContent;
+                                            "
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endforeach

@@ -14,12 +14,14 @@ class Message extends Model
         'created_at',
         'updated_at',
         'is_deleted',
+        'is_edited',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'is_deleted' => 'boolean',
+        'is_edited' => 'boolean',
     ];
 
     public function user(): BelongsTo
