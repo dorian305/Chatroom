@@ -27,7 +27,7 @@
 		
         <!-- Chatbox -->
         <section
-            class="flex flex-col w-3/4"
+            class="flex flex-col w-5/6"
             x-data="{
                 isViewingOldMessages: false,
                 scrollOffsetThreshold: 100,
@@ -382,7 +382,7 @@
         </section>
 
         <!-- Users List -->
-        <aside class="w-1/4 ml-8 rounded-lg">
+        <aside class="w-1/6 ml-10 rounded-lg">
             <h2 class="text-xl font-semibold text-blue-500 mb-4">Online users ({{ $users->count() }})</h2>
             <ul class="">
                 @foreach ($users as $user)
