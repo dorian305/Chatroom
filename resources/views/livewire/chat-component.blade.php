@@ -140,7 +140,13 @@
                                 There are currently no messages to display.
                             </h1>
                             <h3 class="text-md">
-                                Be the first one to start the chat!
+                                Be the first one to
+                                <span
+                                    class="text-blue-500 hover:text-blue-700 underline cursor-pointer font-semibold"
+                                    @click="
+                                        document.querySelector('#chatTextInput').focus();
+                                    "
+                                >start</span> the chat!
                             </h3>
                         </div>
                     @else
@@ -293,6 +299,7 @@
             <div class="mt-4 flex items-center relative h-12 rounded-lg bg-gray-700">
                 <input
                     type="text"
+                    id="chatTextInput"
                     class="flex-1 w-full p-4 bg-inherit rounded-lg border-0 text-gray-200 h-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                     placeholder="Type a message..."
                     wire:model="message"
