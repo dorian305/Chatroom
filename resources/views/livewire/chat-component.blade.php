@@ -146,13 +146,13 @@
                         >
                             <!-- Message action buttons -->
                             <div
-                                class="flex flex-row absolute top-4 right-4"
+                                class="flex flex-row absolute top-4 right-4 rounded-md p-1"
                                 x-show="mouseOverMessage"
                             >
                                 <!-- Edit Button -->
                                 @if ($message->user->id === auth()->user()->id)
                                     <button
-                                        class="rounded-sm hover:bg-gray-600 p-1 h-5 w-5"
+                                        class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
                                         title="Edit message"
                                         wire:click="editMessage({{ $message->id }})"
                                     >
@@ -169,7 +169,7 @@
                                 <!-- Delete Button -->
                                 @if ($message->user->id === auth()->user()->id)
                                     <button
-                                        class="rounded-sm hover:bg-gray-600 p-1 h-5 w-5"
+                                        class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
                                         title="Delete message"
                                         wire:click="deleteMessage({{ $message->id }})"
                                         x-on:click="checkIfViewingOldMessages()"
@@ -206,10 +206,10 @@
                 </div>
             </div>
 
-            <div class="mt-4 flex items-center relative h-14 rounded-lg bg-gray-700">
+            <div class="mt-4 flex items-center relative h-12 rounded-lg bg-gray-700">
                 <input
                     type="text"
-                    class="flex-1 w-full p-4 bg-inherit rounded-lg border-0 text-gray-200 h-full focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    class="flex-1 w-full p-4 bg-inherit rounded-lg border-0 text-gray-200 h-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                     placeholder="Type a message..."
                     wire:model="message"
                     x-data="{
@@ -251,7 +251,7 @@
                     "
                 >
                 <button
-                    class="bg-indigo-500 hover:bg-indigo-600 focus:bg-indigo-600 focus:outline-none px-4 rounded-r-lg h-full w-24 absolute right-0"
+                    class="focus:outline-none px-4 rounded-r-lg h-full w-20 absolute right-0 bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
                     wire:click="sendMessage"
                 >Send</button>
             </div>
@@ -284,7 +284,7 @@
 
         <!-- Users List -->
         <aside class="w-1/4 ml-8 rounded-lg">
-            <h2 class="text-xl font-semibold text-indigo-400 mb-4">Online users ({{ $users->count() }})</h2>
+            <h2 class="text-xl font-semibold text-blue-500 mb-4">Online users ({{ $users->count() }})</h2>
             <ul class="">
                 @foreach ($users as $user)
                     <li
