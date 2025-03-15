@@ -27,7 +27,7 @@
 		
         <!-- Chatbox -->
         <section
-            class="flex flex-col w-5/6"
+            class="flex flex-col w-5/6 relative"
             x-data="{
                 isViewingOldMessages: false,
                 scrollOffsetThreshold: 100,
@@ -303,12 +303,12 @@
                 </div>
             </div>
 
-            <div class="mt-4 flex items-center relative h-12 rounded-lg bg-gray-700">
-                <input
+            <div class="mt-4 flex items-center relative h-auto rounded-lg bg-gray-700">
+                <textarea
                     type="text"
                     id="chatTextInput"
                     maxlength="5000"
-                    class="flex-1 p-4 pr-[calc(10%+1rem)] bg-inherit rounded-lg border-0 text-gray-200 h-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    class="flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 h-full focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
                     placeholder="Type a message..."
                     wire:model="message"
                     x-data="{
@@ -349,10 +349,16 @@
                         sendMessage();
                     "
                 >
+                </textarea>
                 <button
-                    class="focus:outline-none px-4 rounded-r-lg h-full w-[10%] absolute right-0 bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
+                    title="Send message"
+                    class="focus:outline-none p-2 m-4 rounded-full absolute right-0 bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
                     wire:click="sendMessage"
-                >Send</button>
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                    </svg>
+                </button>
             </div>
             <div
                 id="is-typing"
