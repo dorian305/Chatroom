@@ -132,7 +132,7 @@
                 >
                     @foreach ($messages as $message)
                         <div
-                            class="flex flex-row items-start message-elem pb-4 w-full rounded-md relative"
+                            class="flex flex-row items-start message-elem py-4 w-full rounded-md relative hover:bg-gray-700 hover:bg-opacity-20"
                             x-data="{
                                 mouseOverMessage: false,
                                 messageUserId: {{ $message->user->id }}
@@ -146,7 +146,7 @@
                         >
                             <!-- Message action buttons -->
                             <div
-                                class="flex flex-row absolute top-0 right-0"
+                                class="flex flex-row absolute top-4 right-4"
                                 x-show="mouseOverMessage"
                             >
                                 <!-- Edit Button -->
