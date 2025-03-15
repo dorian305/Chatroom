@@ -146,6 +146,15 @@
                                 disableEditMode() {
                                     this.isBeingEdited = false;
                                     this.messageEditedContent = this.messageContent;
+                                },
+                                updateMessage() {
+                                    this.isBeingEdited = false;
+
+                                    if (this.messageContent !== this.messageEditedContent) {
+                                        $wire.editMessage({{ $message->id }}, this.messageContent, this.messageEditedContent);
+
+                                        this.messageContent = this.messageEditedContent;
+                                    }
                                 }
                             }"
                             @mouseenter="
@@ -241,17 +250,12 @@
                                         x-model="messageEditedContent"
                                         x-ref="editInput"
                                         @keydown.escape="disableEditMode()"
+                                        @keydown.enter="updateMessage()"
                                     >
                                     <div class="flex flex-row justify-end">
                                         <button
                                             class="w-20 p-1 mr-2 rounded focus:outline-none bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
-                                            @click="
-                                                isBeingEdited = false;
-                                                
-                                                if (messageContent !== messageEditedContent) {
-                                                    $wire.editMessage({{ $message->id }}, messageContent, messageEditedContent);
-                                                }
-                                            "
+                                            @click="updateMessage()"
                                         >
                                             Save
                                         </button>
