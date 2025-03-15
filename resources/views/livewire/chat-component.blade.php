@@ -301,7 +301,8 @@
                 <input
                     type="text"
                     id="chatTextInput"
-                    class="flex-1 w-full p-4 bg-inherit rounded-lg border-0 text-gray-200 h-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    maxlength="5000"
+                    class="flex-1 p-4 pr-[calc(10%+1rem)] bg-inherit rounded-lg border-0 text-gray-200 h-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                     placeholder="Type a message..."
                     wire:model="message"
                     x-data="{
@@ -343,7 +344,7 @@
                     "
                 >
                 <button
-                    class="focus:outline-none px-4 rounded-r-lg h-full w-20 absolute right-0 bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
+                    class="focus:outline-none px-4 rounded-r-lg h-full w-[10%] absolute right-0 bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
                     wire:click="sendMessage"
                 >Send</button>
             </div>
