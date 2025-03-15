@@ -43,9 +43,12 @@
         >
 
             <div class="rounded-lg overflow-hidden relative">
-                <div class="flex items-center px-4 h-10 bg-gray-800">
+
+                <!-- Chatbox header -->
+                <div class="flex items-center px-4 h-10 bg-gray-800 border-b border-gray-700">
                     Chatbox
                 </div>
+
                 <!-- Notification for when you're looking at old messages -->
                 <div
                     class="absolute z-10 top-10 left-0 w-full bg-gray-500/5 bg-opacity-50 text-center py-2 text-sm"
