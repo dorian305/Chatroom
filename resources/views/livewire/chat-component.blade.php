@@ -45,7 +45,8 @@
             <div class="rounded-lg overflow-hidden relative">
                 <!-- Notification for when you're looking at old messages -->
                 <div
-                    class="absolute z-10 top-0 left-0 w-full bg-gray-500 bg-opacity-50 text-center py-2 text-sm hidden"
+                    class="absolute z-10 top-0 left-0 w-full bg-gray-500 bg-opacity-50 text-center py-2 text-sm"
+                    x-cloak
                     x-show="isViewingOldMessages"
                     x-transition:enter="transition ease-out duration-100"
                     x-transition:enter-start="opacity-0"
@@ -161,6 +162,7 @@
                             <div
                                 class="flex flex-row absolute top-4 right-4 rounded-md p-1"
                                 x-show="mouseOverMessage"
+                                x-cloak
                             >
                                 <!-- Edit Button -->
                                 @if ($message->user->id === auth()->user()->id)
@@ -234,6 +236,7 @@
                                 <div
                                     class="space-y-2"
                                     x-show="isBeingEdited"
+                                    x-cloak
                                 >
                                     <input
                                         type="text"
