@@ -27,7 +27,7 @@
 		
         <!-- Chatbox -->
         <section
-            class="flex flex-col w-full relative"
+            class="flex flex-col w-full"
             x-data="{
                 isViewingOldMessages: false,
                 scrollOffsetThreshold: 100,
@@ -43,9 +43,12 @@
         >
 
             <div class="rounded-lg overflow-hidden relative">
+                <div class="flex items-center px-4 h-10 bg-gray-800">
+                    Chatbox
+                </div>
                 <!-- Notification for when you're looking at old messages -->
                 <div
-                    class="absolute z-10 top-0 left-0 w-full bg-gray-500 bg-opacity-50 text-center py-2 text-sm"
+                    class="absolute z-10 top-10 left-0 w-full bg-gray-500/5 bg-opacity-50 text-center py-2 text-sm"
                     x-cloak
                     x-show="isViewingOldMessages"
                     x-transition:enter="transition ease-out duration-100"
@@ -130,7 +133,7 @@
                 >
                     @foreach ($messages as $message)
                         <div
-                            class="flex flex-row items-start message-elem py-4 w-full rounded-md relative hover:bg-gray-700 hover:bg-opacity-20"
+                            class="flex flex-row items-start message-elem py-4 w-full rounded-md relative hover:bg-gray-700 hover:bg-opacity-20 transition-all duration-100"
                             wire:key="{{ $message->id }}"
                             x-data="{
                                 mouseOverMessage: false,
