@@ -109,7 +109,7 @@
                                         timeAgo = days === 1 ? 'a day ago' : `${days} days ago`;
                                     }
 
-                                    dateElem.textContent = `(${timeAgo})`;
+                                    dateElem.textContent = `${timeAgo}`;
                                 }
                             });
                         }
@@ -201,7 +201,7 @@
                                 alt=""
                             >
                             <div class="w-4/5">
-                                <div class="flex flex-row items-center">
+                                <div class="flex flex-row items-baseline">
                                     <p class="text-base">{{ $message->user->name }}</p>
                                     <p
                                         class="date-elem text-xs text-gray-400 mx-2"
