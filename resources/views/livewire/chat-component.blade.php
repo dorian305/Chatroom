@@ -45,7 +45,7 @@
             <div class="rounded-lg overflow-hidden relative">
                 <!-- Notification for when you're looking at old messages -->
                 <div
-                    class="absolute z-10 top-0 left-0 w-full bg-gray-500 bg-opacity-50 text-center py-2 text-sm"
+                    class="absolute z-10 top-0 left-0 w-full bg-gray-500 bg-opacity-50 text-center py-2 text-sm hidden"
                     x-show="isViewingOldMessages"
                     x-transition:enter="transition ease-out duration-100"
                     x-transition:enter-start="opacity-0"
@@ -182,7 +182,10 @@
                                         class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
                                         title="Delete message"
                                         wire:click="deleteMessage({{ $message->id }})"
-                                        x-on:click="checkIfViewingOldMessages()"
+                                        x-on:click="
+                                            checkIfViewingOldMessages();
+                                            resetInactivityTimer();
+                                        "
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-3">
                                             <path
@@ -234,9 +237,9 @@
                                         x-model="messageEditedContent"
                                         x-ref="editInput"
                                     >
-                                    <div class="flex flex-row space-x-2">
+                                    <div class="flex flex-row justify-end">
                                         <button
-                                            class="w-20 p-1 rounded focus:outline-none bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
+                                            class="w-20 p-1 mr-2 rounded focus:outline-none bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
                                             @click="
                                                 isBeingEdited = false;
                                                 
