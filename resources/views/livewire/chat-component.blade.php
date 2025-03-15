@@ -134,148 +134,159 @@
                         updateTime();
                     "
                 >
-                    @foreach ($messages as $message)
-                        <div
-                            class="flex flex-row items-start message-elem py-4 w-full rounded-md relative hover:bg-gray-700 hover:bg-opacity-20 transition-all duration-100"
-                            wire:key="{{ $message->id }}"
-                            x-data="{
-                                mouseOverMessage: false,
-                                messageUserId: {{ $message->user->id }},
-                                messageContent: '{{ $message->content }}',
-                                messageEditedContent: '{{ $message->content }}',
-                                isBeingEdited: false,
-
-                                enableEditMode() {
-                                    this.isBeingEdited = true;
-                                    this.$nextTick(() => this.$refs.editInput.focus());
-                                },
-                                disableEditMode() {
-                                    this.isBeingEdited = false;
-                                    this.messageEditedContent = this.messageContent;
-                                },
-                                editMessage() {
-                                    this.isBeingEdited = false;
-
-                                    if (this.messageContent !== this.messageEditedContent) {
-                                        $wire.editMessage({{ $message->id }}, this.messageContent, this.messageEditedContent);
-
-                                        this.messageContent = this.messageEditedContent;
-                                    }
-                                }
-                            }"
-                            @mouseenter="
-                                if (messageUserId === {{ auth()->user()->id }}) {
-                                    mouseOverMessage = true;
-                                }
-                            "
-                            @mouseleave="mouseOverMessage = false;"
-                        >
-                            <!-- Message action buttons -->
+                    @if ($messages->count() === 0)
+                        <div class="w-full h-full flex flex-col items-center justify-center">
+                            <h1 class="text-xl">
+                                There are currently no messages to display.
+                            </h1>
+                            <h3 class="text-md">
+                                Be the first one to start the chat!
+                            </h3>
+                        </div>
+                    @else
+                        @foreach ($messages as $message)
                             <div
-                                class="flex flex-row absolute top-4 right-4 rounded-md p-1"
-                                x-show="mouseOverMessage"
-                                x-cloak
+                                class="flex flex-row items-start message-elem py-4 w-full rounded-md relative hover:bg-gray-700 hover:bg-opacity-20 transition-all duration-100"
+                                wire:key="{{ $message->id }}"
+                                x-data="{
+                                    mouseOverMessage: false,
+                                    messageUserId: {{ $message->user->id }},
+                                    messageContent: '{{ $message->content }}',
+                                    messageEditedContent: '{{ $message->content }}',
+                                    isBeingEdited: false,
+
+                                    enableEditMode() {
+                                        this.isBeingEdited = true;
+                                        this.$nextTick(() => this.$refs.editInput.focus());
+                                    },
+                                    disableEditMode() {
+                                        this.isBeingEdited = false;
+                                        this.messageEditedContent = this.messageContent;
+                                    },
+                                    editMessage() {
+                                        this.isBeingEdited = false;
+
+                                        if (this.messageContent !== this.messageEditedContent) {
+                                            $wire.editMessage({{ $message->id }}, this.messageContent, this.messageEditedContent);
+
+                                            this.messageContent = this.messageEditedContent;
+                                        }
+                                    }
+                                }"
+                                @mouseenter="
+                                    if (messageUserId === {{ auth()->user()->id }}) {
+                                        mouseOverMessage = true;
+                                    }
+                                "
+                                @mouseleave="mouseOverMessage = false;"
                             >
-                                <!-- Edit Button -->
-                                @if ($message->user->id === auth()->user()->id)
-                                    <button
-                                        class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
-                                        title="Edit message"
-                                        x-on:click="enableEditMode()"
-                                        x-show="!isBeingEdited"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-3">
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                                        </svg>
-
-                                    </button>
-                                @endif
-
-                                <!-- Delete Button -->
-                                @if ($message->user->id === auth()->user()->id)
-                                    <button
-                                        class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
-                                        title="Delete message"
-                                        wire:click="deleteMessage({{ $message->id }})"
-                                        x-on:click="
-                                            checkIfViewingOldMessages();
-                                            resetInactivityTimer();
-                                        "
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-3">
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
-
-                                    </button>
-                                @endif
-                            </div>
-
-                            <img
-                                class="size-8 rounded-full object-cover mx-4"
-                                src="{{ $message->user->profile_photo_path ? Storage::url($message->user->profile_photo_path) : $message->user->getDefaultProfilePictureUrl() }}"
-                                alt=""
-                            >
-                            <div class="w-4/5">
-                                <div class="flex flex-row items-baseline">
-                                    <p class="text-base">{{ $message->user->name }}</p>
-                                    <p
-                                        class="date-elem text-xs text-gray-400 mx-2"
-                                        data-created-at="{{ $message->created_at->toISOString() }}"
-                                        wire:ignore
-                                    ></p>
-                                </div>
-
-                                <!-- Message content -->
-                                <div x-show="!isBeingEdited">
-                                    <p class="text-gray-300">
-                                        {{ $message->content }}
-                                        
-                                        @if ($message->is_edited)
-                                            <span class="text-sm text-gray-600">
-                                                (edited)
-                                            </span>
-                                        @endif
-                                    </p>
-                                </div>
-
-                                <!-- Edit message mode -->
+                                <!-- Message action buttons -->
                                 <div
-                                    class="space-y-2"
-                                    x-show="isBeingEdited"
+                                    class="flex flex-row absolute top-4 right-4 rounded-md p-1"
+                                    x-show="mouseOverMessage"
                                     x-cloak
                                 >
-                                    <input
-                                        type="text"
-                                        class="w-full p-2 border-0 rounded text-gray-200 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                        x-model="messageEditedContent"
-                                        x-ref="editInput"
-                                        @keydown.escape="disableEditMode()"
-                                        @keydown.enter="editMessage()"
+                                    <!-- Edit Button -->
+                                    @if ($message->user->id === auth()->user()->id)
+                                        <button
+                                            class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
+                                            title="Edit message"
+                                            x-on:click="enableEditMode()"
+                                            x-show="!isBeingEdited"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-3">
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                            </svg>
+
+                                        </button>
+                                    @endif
+
+                                    <!-- Delete Button -->
+                                    @if ($message->user->id === auth()->user()->id)
+                                        <button
+                                            class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
+                                            title="Delete message"
+                                            wire:click="deleteMessage({{ $message->id }})"
+                                            x-on:click="
+                                                checkIfViewingOldMessages();
+                                                resetInactivityTimer();
+                                            "
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-3">
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
+
+                                        </button>
+                                    @endif
+                                </div>
+
+                                <img
+                                    class="size-8 rounded-full object-cover mx-4"
+                                    src="{{ $message->user->profile_photo_path ? Storage::url($message->user->profile_photo_path) : $message->user->getDefaultProfilePictureUrl() }}"
+                                    alt=""
+                                >
+                                <div class="w-4/5">
+                                    <div class="flex flex-row items-baseline">
+                                        <p class="text-base">{{ $message->user->name }}</p>
+                                        <p
+                                            class="date-elem text-xs text-gray-400 mx-2"
+                                            data-created-at="{{ $message->created_at->toISOString() }}"
+                                            wire:ignore
+                                        ></p>
+                                    </div>
+
+                                    <!-- Message content -->
+                                    <div x-show="!isBeingEdited">
+                                        <p class="text-gray-300">
+                                            {{ $message->content }}
+                                            
+                                            @if ($message->is_edited)
+                                                <span class="text-sm text-gray-600">
+                                                    (edited)
+                                                </span>
+                                            @endif
+                                        </p>
+                                    </div>
+
+                                    <!-- Edit message mode -->
+                                    <div
+                                        class="space-y-2"
+                                        x-show="isBeingEdited"
+                                        x-cloak
                                     >
-                                    <div class="flex flex-row justify-end">
-                                        <button
-                                            class="w-20 p-1 mr-2 rounded focus:outline-none bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
-                                            @click="editMessage()"
+                                        <input
+                                            type="text"
+                                            class="w-full p-2 border-0 rounded text-gray-200 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                            x-model="messageEditedContent"
+                                            x-ref="editInput"
+                                            @keydown.escape="disableEditMode()"
+                                            @keydown.enter="editMessage()"
                                         >
-                                            Save
-                                        </button>
-                                        <button
-                                            class="w-20 p-1 rounded focus:outline-none bg-gray-500 hover:bg-gray-400 focus:bg-gray-400"
-                                            @click="disableEditMode()"
-                                        >
-                                            Cancel
-                                        </button>
+                                        <div class="flex flex-row justify-end">
+                                            <button
+                                                class="w-20 p-1 mr-2 rounded focus:outline-none bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
+                                                @click="editMessage()"
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                class="w-20 p-1 rounded focus:outline-none bg-gray-500 hover:bg-gray-400 focus:bg-gray-400"
+                                                @click="disableEditMode()"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    @endif
                 </div>
             </div>
 
