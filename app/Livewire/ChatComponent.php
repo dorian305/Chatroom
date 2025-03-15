@@ -47,6 +47,15 @@ class ChatComponent extends Component
     {
         if ($oldContent === $updatedContent) return;
 
+        // Delete the message user deleted message content.
+        if (!$updatedContent) {
+            DeleteMessage::dispatch(
+                $messageId,
+            );
+
+            return;
+        }
+
         EditMessage::dispatch(
             $messageId,
             $updatedContent,

@@ -273,6 +273,7 @@
                                             x-ref="editInput"
                                             @keydown.escape="disableEditMode()"
                                             @keydown.enter="editMessage()"
+                                            @blur="disableEditMode()"
                                         >
                                         <div class="flex flex-row justify-end">
                                             <button
