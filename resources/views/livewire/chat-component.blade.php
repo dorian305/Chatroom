@@ -141,10 +141,14 @@
                                 messageEditedContent: '{{ $message->content }}',
                                 isBeingEdited: false,
 
-                                toggleEditMode() {
+                                enableEditMode() {
                                     this.isBeingEdited = true;
                                     this.$nextTick(() => this.$refs.editInput.focus());
                                 },
+                                disableEditMode() {
+                                    this.isBeingEdited = false;
+                                    this.messageEditedContent = this.messageContent;
+                                }
                             }"
                             @mouseenter="
                                 if (messageUserId === {{ auth()->user()->id }}) {
@@ -163,7 +167,7 @@
                                     <button
                                         class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
                                         title="Edit message"
-                                        x-on:click="toggleEditMode()"
+                                        x-on:click="enableEditMode()"
                                         x-show="!isBeingEdited"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-3">
@@ -236,6 +240,7 @@
                                         class="w-full p-2 border-0 rounded text-gray-200 bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                         x-model="messageEditedContent"
                                         x-ref="editInput"
+                                        @keydown.escape="disableEditMode()"
                                     >
                                     <div class="flex flex-row justify-end">
                                         <button
@@ -252,10 +257,7 @@
                                         </button>
                                         <button
                                             class="w-20 p-1 rounded focus:outline-none bg-gray-500 hover:bg-gray-400 focus:bg-gray-400"
-                                            @click="
-                                                isBeingEdited = false;
-                                                messageEditedContent = messageContent;
-                                            "
+                                            @click="disableEditMode()"
                                         >
                                             Cancel
                                         </button>
