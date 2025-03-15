@@ -65,10 +65,7 @@
                             });
                             isViewingOldMessages = false;
                         "
-                    >
-                        Scroll down
-                    </span>
-                    to view latest messages.
+                    >Scroll down</span> to view latest messages.
                 </div>
 
                 <!-- Messages -->
