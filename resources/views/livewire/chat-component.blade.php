@@ -27,7 +27,7 @@
 		
         <!-- Chatbox -->
         <section
-            class="flex flex-col w-full"
+            class="flex flex-col w-3/4"
             x-data="{
                 isViewingOldMessages: false,
                 scrollOffsetThreshold: 100,
@@ -232,11 +232,14 @@
                                     @endif
                                 </div>
 
+                                <!-- Message user profile photo -->
                                 <img
                                     class="size-8 rounded-full object-cover mx-4"
                                     src="{{ $message->user->profile_photo_path ? Storage::url($message->user->profile_photo_path) : $message->user->getDefaultProfilePictureUrl() }}"
                                     alt=""
                                 >
+
+                                <!-- Message information -->
                                 <div class="w-4/5">
                                     <div class="flex flex-row items-baseline">
                                         <p class="text-base">{{ $message->user->name }}</p>
@@ -248,7 +251,10 @@
                                     </div>
 
                                     <!-- Message content -->
-                                    <div x-show="!isBeingEdited">
+                                    <div
+                                        class="text-pretty break-words whitespace-normal"
+                                        x-show="!isBeingEdited"
+                                    >
                                         <p class="text-gray-300">
                                             {{ $message->content }}
                                             
@@ -385,6 +391,7 @@
                         wire:key="{{ $user->id }}"
                     >
                         <div class="flex flex-row items-center">
+                            
                             <img
                                 class="size-8 rounded-full object-cover m-2"
                                 src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : $user->getDefaultProfilePictureUrl() }}"
