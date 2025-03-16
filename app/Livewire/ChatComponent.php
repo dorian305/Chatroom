@@ -47,9 +47,15 @@ class ChatComponent extends Component
 
     public function editMessage(int $messageId, string $oldContent, string $updatedContent): void
     {
+        $messageBeingEdited = Message::findOrFail($messageId);
+
+        // If content is the same, just exit.
         if ($oldContent === $updatedContent) return;
 
-        // Delete the message user deleted message content.
+        // Prevent non-owners of the message to edit it.
+        if ($messageBeingEdited->user->id !== auth()->user()->id) return;
+
+        // Delete the message if user deleted message content.
         if (!$updatedContent) {
             DeleteMessage::dispatch(
                 $messageId,
