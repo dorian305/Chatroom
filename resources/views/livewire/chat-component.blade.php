@@ -304,7 +304,7 @@
             </div>
 
             <div
-                class="mt-4 flex items-end relative h-auto rounded-lg bg-gray-700"
+                class="mt-4 flex items-end relative rounded-lg h-[80px] bg-gray-700"
                 x-data="{
                     chatTextarea: document.querySelector('#chatTextarea'),
                     chatMessage: '',
@@ -322,7 +322,7 @@
                     type="text"
                     maxlength="maxChatLength"
                     id="chatTextarea"
-                    class="flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none overflow-hidden"
+                    class="absolute bottom-0 w-full flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none overflow-hidden"
                     placeholder="Type a message..."
                     x-data="{
                         userTyping: false,
