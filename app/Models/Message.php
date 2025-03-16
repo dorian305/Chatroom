@@ -24,6 +24,10 @@ class Message extends Model
         'is_edited' => 'boolean',
     ];
 
+    protected $with = [
+        'user',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

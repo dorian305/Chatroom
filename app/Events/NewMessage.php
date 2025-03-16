@@ -28,8 +28,6 @@ class NewMessage implements ShouldBroadcastNow
             'content' => $messageContent,
         ]);
 
-        $newMessage->load('user');
-        
         $this->message = $newMessage;
     }
 

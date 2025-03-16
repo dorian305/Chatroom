@@ -24,6 +24,8 @@ class ChatComponent extends Component
     #[Validate('required|string|max:5000')]
     public function sendMessage(string $message): void
     {
+        if (!$message) return;
+        
         NewMessage::dispatch(
             $this->localUser->id,
             $message,
@@ -32,8 +34,10 @@ class ChatComponent extends Component
 
     public function deleteMessage(int $messageId): void
     {
-        if (!$messageId) return;
+        $messageBeingDeleted = Message::findOrFail($messageId);
 
+        if ($messageBeingDeleted->user === auth()->user()) return;
+        
         DeleteMessage::dispatch(
             $messageId,
         );
@@ -188,8 +192,7 @@ class ChatComponent extends Component
             ->get()
             ->reject(fn ($user) => $user->id == $this->localUser->id)
             ->prepend($this->localUser);
-        $this->messages = Message::with('user')
-            ->where('is_deleted', '=', false)
+        $this->messages = Message::where('is_deleted', '=', false)
             ->get();
     }
 
