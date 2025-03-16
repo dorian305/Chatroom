@@ -144,7 +144,7 @@
                                 <span
                                     class="text-blue-500 hover:text-blue-700 underline cursor-pointer font-semibold"
                                     @click="
-                                        document.querySelector('#chatTextInput').focus();
+                                        document.querySelector('#chatTextarea').focus();
                                     "
                                 >start</span> the chat!
                             </h3>
@@ -177,7 +177,7 @@
 
                                             this.messageContent = this.messageEditedContent;
                                         }
-                                    }
+                                    },
                                 }"
                                 @mouseenter="
                                     if (messageUserId === {{ auth()->user()->id }}) {
@@ -303,19 +303,36 @@
                 </div>
             </div>
 
-            <div class="mt-4 flex items-center relative h-auto rounded-lg bg-gray-700">
+            <div
+                class="mt-4 flex items-end relative h-auto rounded-lg bg-gray-700"
+                x-data="{
+                    chatTextarea: document.querySelector('#chatTextarea'),
+                    chatMessage: '',
+                    maxChatLength: 5000,
+
+                    sendMessage() {
+                        if (!this.chatMessage) return;
+
+                        $wire.sendMessage(this.chatMessage);
+                        this.chatMessage = '';
+                    },
+                }"
+            >
                 <textarea
                     type="text"
-                    id="chatTextInput"
-                    maxlength="5000"
-                    class="flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 h-full focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                    maxlength="maxChatLength"
+                    id="chatTextarea"
+                    class="flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none overflow-hidden"
                     placeholder="Type a message..."
-                    wire:model="message"
                     x-data="{
                         userTyping: false,
                         typingTimeoutTime: 5000,
                         typingTimeoutHandler: null,
 
+                        autoResizeTextarea() {
+                            $el.style.height = 'auto';
+                            $el.style.height = $el.scrollHeight + 'px';
+                        },
                         resetTimeoutOnInput() {
                             clearTimeout(this.typingTimeoutHandler);
                             this.typingTimeoutHandler = setTimeout(() => this.updateUserNotTyping(), this.typingTimeoutTime)
@@ -328,32 +345,33 @@
                             this.userTyping = false;
                             $wire.typing('{{ auth()->user()->name }}', false);
                         },
-                        sendMessage() {
-                            $wire.sendMessage();
-                        }
                     }"
-                    x-on:input="
+                    x-model="chatMessage"
+                    @input="
                         if (!userTyping) {
+                            chatMessage = $el.value;
+
                             updateUserTyping();
                         }
 
                         resetTimeoutOnInput();
                         resetInactivityTimer();
-                        
+                        autoResizeTextarea();
                     "
-                    x-on:keydown.enter="
+                    @keydown.enter="
                         if (userTyping) {
                             updateUserNotTyping();
                         }
 
-                        sendMessage();
+                        autoResizeTextarea();
                     "
+                    wire:ignore
                 >
                 </textarea>
                 <button
                     title="Send message"
                     class="focus:outline-none p-2 m-4 rounded-full absolute right-0 bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
-                    wire:click="sendMessage"
+                    @click="sendMessage()"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
@@ -403,7 +421,7 @@
                                 src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : $user->getDefaultProfilePictureUrl() }}"
                                 alt=""
                             >
-                            <span wire:model="username">
+                            <span>
                                 {{ $user->name }}
                             </span>
                         </div>

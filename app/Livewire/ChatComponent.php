@@ -15,23 +15,19 @@ use Livewire\Component;
 
 class ChatComponent extends Component
 {
-    public string $message = "";
-    public string $username = "";
     public array $usersCurrentlyTyping = [];
     public Collection $users;
     public Collection $messages;
     public User $localUser;
 
-    public function sendMessage(): void
+    public function sendMessage(string $message): void
     {
-        if (!trim($this->message)) return;
+        if (!trim($message)) return;
 
         NewMessage::dispatch(
             $this->localUser->id,
-            $this->message,
+            $message,
         );
-
-        $this->message = "";
     }
 
     public function deleteMessage(int $messageId): void
