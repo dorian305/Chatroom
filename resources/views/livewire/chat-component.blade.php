@@ -366,7 +366,7 @@
                 </input>
                 <button
                     title="Send message"
-                    class="focus:outline-none p-2 mx-4 absolute right-0 rounded-full bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
+                    class="focus:outline-none p-2 mx-4 absolute right-0 rounded-lg bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
                     @click="
                         sendMessage();
                     "
