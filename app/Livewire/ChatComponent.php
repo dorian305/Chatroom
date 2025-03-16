@@ -24,6 +24,7 @@ class ChatComponent extends Component
     #[Validate('required|string|max:5000')]
     public function sendMessage(string $message): void
     {
+        // Prevent empty messages from being submitted.
         if (!$message) return;
         
         NewMessage::dispatch(
@@ -36,7 +37,8 @@ class ChatComponent extends Component
     {
         $messageBeingDeleted = Message::findOrFail($messageId);
 
-        if ($messageBeingDeleted->user === auth()->user()) return;
+        // Prevent non-owners of the message to delete it.
+        if ($messageBeingDeleted->user->id !== auth()->user()->id) return;
         
         DeleteMessage::dispatch(
             $messageId,
