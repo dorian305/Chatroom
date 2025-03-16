@@ -297,6 +297,38 @@
                         @endforeach
                     @endif
                 </div>
+
+                <!-- Uploaded images temp preview -->
+                @if ($uploadedFile)
+                    <div class="flex flex-row absolute z-10 bottom-0 left-0 w-full bg-gray-800 p-2">
+                        <div
+                            class="relative w-32 h-32 p-2 m-1 rounded-lg bg-gray-900"
+                            x-data="{
+                                deleteFilePreview() {
+                                    $wire.deleteUploadedFile();
+                                }
+                            }"
+                        >
+                            <button
+                                class="absolute -right-2 -top-2 z-10 border border-gray-700 rounded-lg p-1 text-red-600 bg-gray-900 hover:text-red-500 hover:bg-gray-800"
+                                title="Delete file"
+                                @click="deleteFilePreview()"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-4">
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            </button>
+                            <img
+                                src="{{ $uploadedFile->temporaryUrl() }}"
+                                alt="Preview"
+                                class="w-full h-full object-contain bg-gray-900"
+                            >
+                        </div>
+                    </div>
+                @endif
             </div>
 
             <div
@@ -326,6 +358,7 @@
                         userTyping: false,
                         typingTimeoutTime: 5000,
                         typingTimeoutHandler: null,
+                        uploadedFile: null,
 
                         resetTimeoutOnInput() {
                             clearTimeout(this.typingTimeoutHandler);
@@ -338,6 +371,24 @@
                         updateUserNotTyping() {
                             this.userTyping = false;
                             $wire.typing('{{ auth()->user()->name }}', false);
+                        },
+                        createFilePreview() {
+                            const file = this.$event.clipboardData.items[0];
+
+                            // Only support image uploads for now.
+                            if (!file || file.kind !== 'file' || !file.type.startsWith('image/')) return;
+
+                            this.uploadedFile = file.getAsFile();
+                            $wire.upload(
+                                'uploadedFile',
+                                this.uploadedFile,
+                                () => {
+                                    // Upload success
+                                },
+                                error => {
+                                    console.error('upload failed: ', error);
+                                }
+                            );
                         },
                     }"
                     x-model="chatMessage"
@@ -358,8 +409,8 @@
 
                         sendMessage();
                     "
+                    @paste="createFilePreview()"
                 >
-                </input>
                 <button
                     title="Send message"
                     class="focus:outline-none p-2 mx-4 absolute right-0 rounded-lg bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
@@ -375,7 +426,6 @@
             <div
                 id="is-typing"
                 class="absolute z-10 -bottom-6 left-0 w-full py-1 text-xs text-gray-400 flex"
-                wire:model="usersCurrentlyTyping"
             >
                 @php
                     // Filter out the local user's name and re-index the array

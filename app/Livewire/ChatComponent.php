@@ -11,17 +11,19 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ChatComponent extends Component
 {
+    use WithFileUploads;
+
     public array $usersCurrentlyTyping = [];
     public Collection $users;
     public Collection $messages;
     public User $localUser;
+    public $uploadedFile;
 
-    #[Validate('required|string|max:5000')]
     public function sendMessage(string $message): void
     {
         // Prevent empty messages from being submitted.
@@ -84,6 +86,11 @@ class ChatComponent extends Component
             $username,
             $isTyping,
         );
+    }
+
+    public function deleteUploadedFile(): void
+    {
+        $this->uploadedFile = null;
     }
 
     #[On('echo:chatroom,NewMessage')]
