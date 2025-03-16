@@ -11,6 +11,7 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class ChatComponent extends Component
@@ -20,10 +21,9 @@ class ChatComponent extends Component
     public Collection $messages;
     public User $localUser;
 
+    #[Validate('required|string|max:5000')]
     public function sendMessage(string $message): void
     {
-        if (!trim($message)) return;
-
         NewMessage::dispatch(
             $this->localUser->id,
             $message,

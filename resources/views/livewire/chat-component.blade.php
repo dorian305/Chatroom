@@ -144,7 +144,7 @@
                                 <span
                                     class="text-blue-500 hover:text-blue-700 underline cursor-pointer font-semibold"
                                     @click="
-                                        document.querySelector('#chatTextarea').focus();
+                                        document.querySelector('#chatInputBox').focus();
                                     "
                                 >start</span> the chat!
                             </h3>
@@ -252,7 +252,7 @@
 
                                     <!-- Message content -->
                                     <div
-                                        class="text-pretty break-words whitespace-normal"
+                                        class=""
                                         x-show="!isBeingEdited"
                                     >
                                         <p class="text-gray-300">
@@ -304,13 +304,15 @@
             </div>
 
             <div
-                class="mt-4 flex items-end relative rounded-lg h-[80px] bg-gray-700"
+                class="mt-4 flex items-center rounded-lg relative bg-gray-700"
                 x-data="{
-                    chatTextarea: document.querySelector('#chatTextarea'),
+                    chatInputBox: document.querySelector('#chatInputBox'),
                     chatMessage: '',
                     maxChatLength: 5000,
 
                     sendMessage() {
+                        this.chatMessage = this.chatMessage.trim();
+                        
                         if (!this.chatMessage) return;
 
                         $wire.sendMessage(this.chatMessage);
@@ -318,21 +320,17 @@
                     },
                 }"
             >
-                <textarea
+                <input
                     type="text"
                     maxlength="maxChatLength"
-                    id="chatTextarea"
-                    class="absolute bottom-0 w-full flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none overflow-hidden"
+                    id="chatInputBox"
+                    class="flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
                     placeholder="Type a message..."
                     x-data="{
                         userTyping: false,
                         typingTimeoutTime: 5000,
                         typingTimeoutHandler: null,
 
-                        autoResizeTextarea() {
-                            $el.style.height = 'auto';
-                            $el.style.height = $el.scrollHeight + 'px';
-                        },
                         resetTimeoutOnInput() {
                             clearTimeout(this.typingTimeoutHandler);
                             this.typingTimeoutHandler = setTimeout(() => this.updateUserNotTyping(), this.typingTimeoutTime)
@@ -356,22 +354,22 @@
 
                         resetTimeoutOnInput();
                         resetInactivityTimer();
-                        autoResizeTextarea();
                     "
                     @keydown.enter="
                         if (userTyping) {
                             updateUserNotTyping();
                         }
 
-                        autoResizeTextarea();
+                        sendMessage();
                     "
-                    wire:ignore
                 >
-                </textarea>
+                </input>
                 <button
                     title="Send message"
-                    class="focus:outline-none p-2 m-4 rounded-full absolute right-0 bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
-                    @click="sendMessage()"
+                    class="focus:outline-none p-2 mx-4 absolute right-0 rounded-full bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
+                    @click="
+                        sendMessage();
+                    "
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
