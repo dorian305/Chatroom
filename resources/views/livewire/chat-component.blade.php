@@ -312,7 +312,7 @@
                 @if ($uploadedFile)
                     <div class="flex flex-row absolute z-10 bottom-0 left-0 w-full bg-gray-800 p-2">
                         <div
-                            class="relative w-32 h-32 p-2 m-1 rounded-lg bg-gray-900"
+                            class="text-center relative px-2 mx-1 rounded-lg bg-gray-900"
                             x-data="{
                                 deleteFilePreview() {
                                     $wire.deleteUploadedFile();
@@ -334,11 +334,11 @@
                             <img
                                 src="{{ $uploadedFile->temporaryUrl() }}"
                                 alt="Preview"
-                                class="w-full h-full object-contain bg-gray-900"
+                                class="my-2 w-32 h-32 object-contain bg-gray-900"
                             >
-                            <span>
+                            <div class="my-2">
                                 {{ $uploadedFile->getClientOriginalName() }}
-                            </span>
+                            </div>
                         </div>
                     </div>
                 @endif
