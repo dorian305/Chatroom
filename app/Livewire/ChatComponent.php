@@ -34,6 +34,8 @@ class ChatComponent extends Component
             $message,
             $this->uploadedFile,
         );
+
+        $this->uploadedFile = null;
     }
 
     public function deleteMessage(int $messageId): void

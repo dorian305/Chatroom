@@ -260,14 +260,13 @@
                                                 </span>
                                             @endif
                                         </p>
-                                        @if ($message->files)
-                                            @foreach ($message->files as $file)
-                                                <!-- Image files -->
-                                                @if (explode('/', $file->file_type)[0] === 'image')
-                                                    <img src="{{ Storage::url($file->uploaded_file_path) }}">
-                                                @endif
-                                            @endforeach
-                                        @endif
+
+                                        @foreach ($message->files ?? [] as $file)
+                                            <!-- Image files -->
+                                            @if (str_starts_with($file->file_type, 'image/'))
+                                                <img src="{{ Storage::url($file->uploaded_file_path) }}">
+                                            @endif
+                                        @endforeach
                                     </div>
 
                                     <!-- Edit message mode -->
