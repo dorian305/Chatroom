@@ -264,7 +264,10 @@
                                         @foreach ($message->files ?? [] as $file)
                                             <!-- Image files -->
                                             @if (str_starts_with($file->file_type, 'image/'))
-                                                <img src="{{ Storage::url($file->uploaded_file_path) }}">
+                                                <img
+                                                    class="rounded-lg my-2"
+                                                    src="{{ Storage::url($file->uploaded_file_path) }}"
+                                                >
                                             @endif
                                         @endforeach
                                     </div>
