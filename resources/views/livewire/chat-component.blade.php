@@ -260,6 +260,14 @@
                                                 </span>
                                             @endif
                                         </p>
+                                        @if ($message->files)
+                                            @foreach ($message->files as $file)
+                                                <!-- Image files -->
+                                                @if (explode('/', $file->file_type)[0] === 'image')
+                                                    <img src="{{ Storage::url($file->uploaded_file_path) }}">
+                                                @endif
+                                            @endforeach
+                                        @endif
                                     </div>
 
                                     <!-- Edit message mode -->
@@ -326,6 +334,9 @@
                                 alt="Preview"
                                 class="w-full h-full object-contain bg-gray-900"
                             >
+                            <span>
+                                {{ $uploadedFile->getClientOriginalName() }}
+                            </span>
                         </div>
                     </div>
                 @endif
@@ -337,14 +348,35 @@
                     chatInputBox: document.querySelector('#chatInputBox'),
                     chatMessage: '',
                     maxChatLength: 5000,
+                    uploadedFile: null,
 
                     sendMessage() {
                         this.chatMessage = this.chatMessage.trim();
                         
-                        if (!this.chatMessage) return;
+                        if (!this.chatMessage && !this.uploadedFile) return;
 
                         $wire.sendMessage(this.chatMessage);
+                        
                         this.chatMessage = '';
+                        this.uploadedFile = null;
+                    },
+                    createFilePreview() {
+                        const file = this.$event.clipboardData.items[0];
+
+                        // Only support image uploads for now.
+                        if (!file || file.kind !== 'file' || !file.type.startsWith('image/')) return;
+
+                        this.uploadedFile = file.getAsFile();
+                        $wire.upload(
+                            'uploadedFile',
+                            this.uploadedFile,
+                            () => {
+                                // Upload success
+                            },
+                            error => {
+                                console.error('upload failed: ', error);
+                            }
+                        );
                     },
                 }"
             >
@@ -358,7 +390,6 @@
                         userTyping: false,
                         typingTimeoutTime: 5000,
                         typingTimeoutHandler: null,
-                        uploadedFile: null,
 
                         resetTimeoutOnInput() {
                             clearTimeout(this.typingTimeoutHandler);
@@ -371,24 +402,6 @@
                         updateUserNotTyping() {
                             this.userTyping = false;
                             $wire.typing('{{ auth()->user()->name }}', false);
-                        },
-                        createFilePreview() {
-                            const file = this.$event.clipboardData.items[0];
-
-                            // Only support image uploads for now.
-                            if (!file || file.kind !== 'file' || !file.type.startsWith('image/')) return;
-
-                            this.uploadedFile = file.getAsFile();
-                            $wire.upload(
-                                'uploadedFile',
-                                this.uploadedFile,
-                                () => {
-                                    // Upload success
-                                },
-                                error => {
-                                    console.error('upload failed: ', error);
-                                }
-                            );
                         },
                     }"
                     x-model="chatMessage"
@@ -414,9 +427,7 @@
                 <button
                     title="Send message"
                     class="focus:outline-none p-2 mx-4 absolute right-0 rounded-lg bg-blue-500 hover:bg-blue-400 focus:bg-blue-400"
-                    @click="
-                        sendMessage();
-                    "
+                    @click="sendMessage()"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />

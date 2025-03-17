@@ -27,11 +27,12 @@ class ChatComponent extends Component
     public function sendMessage(string $message): void
     {
         // Prevent empty messages from being submitted.
-        if (!$message) return;
+        if (!$message && !$this->uploadedFile) return;
         
         NewMessage::dispatch(
             $this->localUser->id,
             $message,
+            $this->uploadedFile,
         );
     }
 

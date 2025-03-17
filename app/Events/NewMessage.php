@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\ChatUploadedFile;
 use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -21,12 +22,22 @@ class NewMessage implements ShouldBroadcastNow
     public function __construct(
         int $userId,
         string $messageContent,
+        $uploadedFile,
     )
     {
         $newMessage = Message::create([
             'user_id' => $userId,
             'content' => $messageContent,
         ]);
+
+        // If file is uploaded, attach it to the message.
+        if ($uploadedFile) {
+            $uploadedFile = ChatUploadedFile::create([
+                'message_id' => $newMessage->id,
+                'uploaded_file_path' => $uploadedFile->store('chat-uploads'),
+                'file_type' => $uploadedFile->getMimeType(),
+            ]);
+        }
 
         $this->message = $newMessage;
     }
