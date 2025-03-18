@@ -58,7 +58,7 @@ class ChatComponent extends Component
         $messageBeingDeleted = Message::findOrFail($messageId);
 
         // Prevent non-owners of the message to delete it.
-        if ($messageBeingDeleted->user->id !== auth()->user()->id) return;
+        if ($messageBeingDeleted->user->id !== $this->localUser->id) return;
         
         DeleteMessage::dispatch(
             $messageId,
@@ -83,7 +83,7 @@ class ChatComponent extends Component
         $messageBeingEdited = Message::findOrFail($messageId);
 
         // Prevent non-owners of the message to edit it.
-        if ($messageBeingEdited->user->id !== auth()->user()->id) return;
+        if ($messageBeingEdited->user->id !== $this->localUser->id) return;
 
         // Delete the message if user deleted message content.
         if (!$updatedContent) {
@@ -127,7 +127,7 @@ class ChatComponent extends Component
         )->validate();
 
         // If local user has attempted to change the name, just ignore.
-        if (!$username === auth()->user()->name) return;
+        if (!$username === $this->localUser->name) return;
 
         UserTyping::dispatch(
             $username,
