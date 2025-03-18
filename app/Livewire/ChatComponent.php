@@ -9,7 +9,9 @@ use App\Events\UserActivity;
 use App\Events\UserTyping;
 use App\Models\Message;
 use App\Models\User;
+use App\Rules\ActivityStatusRule;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -77,6 +79,17 @@ class ChatComponent extends Component
 
     public function updateUserActivity(int $userId, string $activityStatus): void
     {
+        Validator::make(
+            [
+                'activityStatus' => $activityStatus,
+                'userId' => $userId,
+            ],
+            [
+                'activityStatus' => ['required', new ActivityStatusRule()],
+                'userId' => ['required', 'exists:users,id'],
+            ],
+        )->validate();
+
         UserActivity::dispatch(
             $userId,
             $activityStatus,
