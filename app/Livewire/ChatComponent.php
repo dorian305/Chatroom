@@ -104,12 +104,12 @@ class ChatComponent extends Component
     {
         Validator::make(
             [
-                'activityStatus' => $activityStatus,
                 'userId' => $userId,
+                'activityStatus' => $activityStatus,
             ],
             [
-                'activityStatus' => ['required', new ActivityStatusRule()],
                 'userId' => ['required', 'exists:users,id'],
+                'activityStatus' => ['required', new ActivityStatusRule()],
             ],
         )->validate();
 
@@ -242,12 +242,8 @@ class ChatComponent extends Component
         $this->messages = collect();
         $this->localUser = auth()->user();
 
-        UserActivity::dispatch(
-            $this->localUser->id,
-            'active',
-        );
-
         $this->updateUserStatus($this->localUser->id, true);
+        $this->updateUserActivity($this->localUser->id, 'active');
 
         $this->users = User::with('messages')
             ->where('is_online', true)
