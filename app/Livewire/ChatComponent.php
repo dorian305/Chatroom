@@ -28,12 +28,16 @@ class ChatComponent extends Component
 
     public function sendMessage(string $message): void
     {
-        if (!$this->uploadedFile) {
-            Validator::make(
-                ['message' => $message],
-                ['message' => ['required', 'string', 'max:5000']]
-            )->validate();
-        }
+        Validator::make(
+            [
+                'message' => $message,
+                'file' => $this->uploadedFile
+            ],
+            [
+                'message' => ['required_without:file', 'nullable', 'string', 'max:5000'],
+                'file' => ['required_without:message', 'nullable', 'file', 'max:10240']
+            ]
+        )->validate();
         
         NewMessage::dispatch(
             $this->localUser->id,
@@ -130,9 +134,9 @@ class ChatComponent extends Component
     #[On('echo:chatroom,DeleteMessage')]
     public function deletedMessage($data): void
     {
-        // This shit just fucking works and i dont know why.
-        // Messages just get updated when event is fired.
-        // If I comment out this method, then it doesn't work.
+        $this->messages = $this->messages->reject(fn ($msg): bool =>
+            $msg->id === $data['messageId']
+        );
     }
 
     #[On('echo:chatroom,EditMessage')]
