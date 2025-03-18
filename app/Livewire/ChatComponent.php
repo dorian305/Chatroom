@@ -121,6 +121,14 @@ class ChatComponent extends Component
 
     public function typing(string $username, bool $isTyping): void
     {
+        Validator::make(
+            ['username' => $username],
+            ['username' => ['required', 'exists:users,name']]
+        )->validate();
+
+        // If local user has attempted to change the name, just ignore.
+        if (!$username === auth()->user()->name) return;
+
         UserTyping::dispatch(
             $username,
             $isTyping,
