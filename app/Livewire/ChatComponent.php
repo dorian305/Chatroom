@@ -28,8 +28,12 @@ class ChatComponent extends Component
 
     public function sendMessage(string $message): void
     {
-        // Prevent empty messages from being submitted.
-        if (!$message && !$this->uploadedFile) return;
+        if (!$this->uploadedFile) {
+            Validator::make(
+                ['message' => $message],
+                ['message' => ['required', 'string', 'max:5000']]
+            )->validate();
+        }
         
         NewMessage::dispatch(
             $this->localUser->id,
