@@ -42,6 +42,11 @@ class ChatComponent extends Component
 
     public function deleteMessage(int $messageId): void
     {
+        Validator::make(
+            ['messageId' => $messageId],
+            ['messageId' => ['required', 'exists:messages,id']],
+        )->validate();
+
         $messageBeingDeleted = Message::findOrFail($messageId);
 
         // Prevent non-owners of the message to delete it.
