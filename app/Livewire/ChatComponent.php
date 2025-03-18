@@ -67,10 +67,20 @@ class ChatComponent extends Component
 
     public function editMessage(int $messageId, string $oldContent, string $updatedContent): void
     {
-        $messageBeingEdited = Message::findOrFail($messageId);
+        Validator::make(
+            [
+                'messageId' => $messageId,
+                'oldContent' => $oldContent,
+                'updatedContent' => $updatedContent,
+            ],
+            [
+                'messageId' => ['required', 'exists:messages,id'],
+                'oldContent' => ['required', 'string', "max:5000", 'different:updatedContent'],
+                'updatedContent' => ['nullable', 'string', "max:5000"],
+            ]
+        )->validate();
 
-        // If content is the same, just exit.
-        if ($oldContent === $updatedContent) return;
+        $messageBeingEdited = Message::findOrFail($messageId);
 
         // Prevent non-owners of the message to edit it.
         if ($messageBeingEdited->user->id !== auth()->user()->id) return;
