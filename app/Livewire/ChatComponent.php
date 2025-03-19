@@ -11,6 +11,7 @@ use App\Models\Message;
 use App\Models\User;
 use App\Rules\ActivityStatusRule;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -20,32 +21,43 @@ class ChatComponent extends Component
 {
     use WithFileUploads;
 
+    public array $newFileUploads = [];
+    public array $uploadedFiles = [];
     public array $usersCurrentlyTyping = [];
     public Collection $users;
     public Collection $messages;
     public User $localUser;
-    public $uploadedFile;
+
+    public function updatedNewFileUploads()
+    {
+        $this->uploadedFiles = [
+            ...$this->uploadedFiles,
+            ...$this->newFileUploads
+        ];
+        $this->newFileUploads = [];
+    }
 
     public function sendMessage(string $message): void
     {
         Validator::make(
             [
                 'message' => $message,
-                'file' => $this->uploadedFile
+                'files' => $this->uploadedFiles
             ],
             [
                 'message' => ['required_without:file', 'nullable', 'string', 'max:5000'],
-                'file' => ['required_without:message', 'nullable', 'file', 'max:10240']
+                'files' => ['required_without:message', 'nullable', 'array'],
+                'files.*' => ['file', 'max:10240'],
             ]
         )->validate();
-        
+
         NewMessage::dispatch(
             $this->localUser->id,
             $message,
-            $this->uploadedFile,
+            $this->uploadedFiles,
         );
 
-        $this->uploadedFile = null;
+        $this->uploadedFiles = [];
     }
 
     public function deleteMessage(int $messageId): void
@@ -135,9 +147,22 @@ class ChatComponent extends Component
         );
     }
 
-    public function deleteUploadedFile(): void
+    public function deleteUploadedFilePreview(string $fileId): void
     {
-        $this->uploadedFile = null;
+        $path = "livewire-tmp/$fileId";
+
+        foreach ($this->uploadedFiles as $uploadedFile) {
+            if (Storage::exists($path)){
+                Storage::delete($path);
+            }
+
+            $this->uploadedFiles = array_values(
+                array_filter(
+                    $this->uploadedFiles,
+                    fn ($uploadedFile): bool => $uploadedFile->getFilename() !== $fileId
+                )
+            );
+        }
     }
 
     #[On('echo:chatroom,NewMessage')]
