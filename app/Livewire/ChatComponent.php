@@ -87,7 +87,7 @@ class ChatComponent extends Component
             ],
             [
                 'messageId' => ['required', 'exists:messages,id'],
-                'oldContent' => ['required', 'string', "max:5000", 'different:updatedContent'],
+                'oldContent' => ['string', "max:5000", 'different:updatedContent'],
                 'updatedContent' => ['nullable', 'string', "max:5000"],
             ]
         )->validate();
@@ -97,8 +97,8 @@ class ChatComponent extends Component
         // Prevent non-owners of the message to edit it.
         if ($messageBeingEdited->user->id !== $this->localUser->id) return;
 
-        // Delete the message if user deleted message content.
-        if (!$updatedContent) {
+        // Delete the message if user deleted message content and message has no files attached to it.
+        if (!$updatedContent && $messageBeingEdited->files->isEmpty()) {
             DeleteMessage::dispatch(
                 $messageId,
             );
