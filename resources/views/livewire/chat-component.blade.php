@@ -132,6 +132,7 @@
                     @updated-messages.window="
                         scrollToLatestMessage();
                         updateTime();
+                        checkIfViewingOldMessages();
                     "
                 >
                     @if ($messages->count() === 0)
@@ -213,10 +214,7 @@
                                             class="rounded-sm p-1 h-5 w-5 hover:text-blue-400"
                                             title="Delete message"
                                             wire:click="deleteMessage({{ $message->id }})"
-                                            x-on:click="
-                                                checkIfViewingOldMessages();
-                                                resetInactivityTimer();
-                                            "
+                                            x-on:click="resetInactivityTimer()"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-3">
                                                 <path
@@ -518,7 +516,6 @@
                         position: 'top-center',
                     });
                 });
-
         </script>
     @endscript
 </div>

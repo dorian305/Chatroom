@@ -180,6 +180,8 @@ class ChatComponent extends Component
         $this->messages = $this->messages->reject(fn ($msg): bool =>
             $msg->id === $data['messageId']
         );
+
+        $this->dispatch('updated-messages');
     }
 
     #[On('echo:chatroom,EditMessage')]
