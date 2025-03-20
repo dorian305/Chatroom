@@ -283,7 +283,8 @@ class ChatComponent extends Component
         $this->updateUserStatus($this->localUser->id, true);
         $this->updateUserActivity($this->localUser->id, 'active');
 
-        $this->users = User::where('is_online', true)
+        $this->users = User::with(['messages'])
+            ->where('is_online', true)
             ->get()
             ->reject(fn ($user) => $user->id == $this->localUser->id)
             ->prepend($this->localUser);
