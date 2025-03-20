@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use App\Events\UserRemoveChatUploadedFiles;
 
 class User extends Authenticatable
 {
@@ -32,6 +33,10 @@ class User extends Authenticatable
         'password',
         'is_online',
         'activity_status',
+    ];
+
+    protected $dispatchesEvents = [
+        'deleting' => UserRemoveChatUploadedFiles::class
     ];
 
     /**
