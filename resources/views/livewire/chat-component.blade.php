@@ -416,6 +416,7 @@
                         resetTimeoutOnInput();
                         resetInactivityTimer();
                     "
+                    x-on:focus="resetInactivityTimer()"
                     @keydown.enter="
                         if (userTyping) {
                             updateUserNotTyping();
