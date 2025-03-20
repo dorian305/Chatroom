@@ -34,6 +34,10 @@ class User extends Authenticatable
         'activity_status',
     ];
 
+    protected $with = [
+        'messages',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *

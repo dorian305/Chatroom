@@ -24,17 +24,26 @@ class ChatComponent extends Component
     public array $newFileUploads = [];
     public array $uploadedFiles = [];
     public array $usersCurrentlyTyping = [];
-    public Collection $users;
-    public Collection $messages;
     public User $localUser;
+    public Collection $users;
+    public int $onlineUsersNumber = 0;
+    public string $searchUsers = '';
+    public Collection $messages;
 
-    public function updatedNewFileUploads()
+    public function updatedNewFileUploads(): void
     {
         $this->uploadedFiles = [
             ...$this->uploadedFiles,
             ...$this->newFileUploads
         ];
         $this->newFileUploads = [];
+    }
+
+    public function updatedSearchUsers(): void
+    {
+        $this->users = User::where('is_online', true)
+            ->where('name', 'like', "%{$this->searchUsers}%")
+            ->get();
     }
 
     public function sendMessage(string $message): void
@@ -241,6 +250,7 @@ class ChatComponent extends Component
     {
         $connectedUser = User::findOrFail($userId);
         $this->users = $this->users->push($connectedUser);
+        $this->onlineUsersNumber = $this->users->count();
     }
 
     #[On('user-disconnected')]
@@ -254,6 +264,7 @@ class ChatComponent extends Component
         ]);
 
         $this->users = $this->users->reject(fn ($user) => $user->id === $disconnectedUser->id);
+        $this->onlineUsersNumber = $this->users->count();
     }
 
     public function updateUserStatus(int $userId, bool $online): void
@@ -272,13 +283,13 @@ class ChatComponent extends Component
         $this->updateUserStatus($this->localUser->id, true);
         $this->updateUserActivity($this->localUser->id, 'active');
 
-        $this->users = User::with('messages')
-            ->where('is_online', true)
+        $this->users = User::where('is_online', true)
             ->get()
             ->reject(fn ($user) => $user->id == $this->localUser->id)
             ->prepend($this->localUser);
         $this->messages = Message::where('is_deleted', '=', false)
             ->get();
+        $this->onlineUsersNumber = $this->users->count();
     }
 
     public function render()

@@ -135,7 +135,7 @@
                         checkIfViewingOldMessages();
                     "
                 >
-                    @if ($messages->count() === 0)
+                    @if ($messages->isEmpty())
                         <div class="w-full h-full flex flex-col items-center justify-center">
                             <h1 class="text-xl">
                                 There are currently no messages to display.
@@ -383,7 +383,7 @@
                     type="text"
                     maxlength="maxChatLength"
                     id="chatInputBox"
-                    class="flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                    class="flex-1 p-4 pr-20 bg-inherit rounded-lg border-0 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     placeholder="Type a message..."
                     x-data="{
                         userTyping: false,
@@ -461,34 +461,44 @@
 
         <!-- Users List -->
         <aside class="w-1/6 ml-10 rounded-lg">
-            <h2 class="text-xl font-semibold text-blue-500 mb-4">Online users ({{ $users->count() }})</h2>
-            <ul class="">
-                @foreach ($users as $user)
-                    <li
-                        class="flex items-center justify-between py-2"
-                        wire:key="{{ $user->id }}"
-                    >
-                        <div class="flex flex-row items-center">
-                            
-                            <img
-                                class="size-8 rounded-full object-cover m-2"
-                                src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : $user->getDefaultProfilePictureUrl() }}"
-                                alt=""
-                            >
-                            <span>
-                                {{ $user->name }}
-                            </span>
-                        </div>
+            <h2 class="text-xl font-semibold text-blue-500 mb-4">Online users ({{ $onlineUsersNumber }})</h2>
+            <input
+                type="text"
+                class="mb-4 p-2 w-full bg-inherit rounded-lg border-0 text-gray-200"
+                placeholder="Search users..."
+                wire:model.live="searchUsers"
+            >
+            @if ($users->isEmpty())
+                <p class="">No users found</p>
+            @else
+                <ul class="">
+                    @foreach ($users as $user)
+                        <li
+                            class="flex items-center justify-between py-2"
+                            wire:key="{{ $user->id }}"
+                        >
+                            <div class="flex flex-row items-center">
+                                
+                                <img
+                                    class="size-8 rounded-full object-cover"
+                                    src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : $user->getDefaultProfilePictureUrl() }}"
+                                    alt=""
+                                >
+                                <span class="mx-2">
+                                    {{ $user->name }}
+                                </span>
+                            </div>
 
-                        <!-- Green button -->
-                        <span
-                            class="w-2 h-2 rounded-full ml-2"
-                            title="{{ $user->activity_status }}"
-                            style="background-color: {{ $user->activity_status === 'active' ? 'rgb(34, 197, 94)' : 'rgb(254, 240, 138)' }};"
-                        ></span>
-                    </li>
-                @endforeach
-            </ul>
+                            <!-- Green button -->
+                            <span
+                                class="w-2 h-2 rounded-full ml-2"
+                                title="{{ $user->activity_status }}"
+                                style="background-color: {{ $user->activity_status === 'active' ? 'rgb(34, 197, 94)' : 'rgb(254, 240, 138)' }};"
+                            ></span>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
         </aside>
     </div>
     <livewire:toast-notification-component></livewire:toast-notification-component>
