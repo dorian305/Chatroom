@@ -18,7 +18,7 @@
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link href="{{ route('chat') }}" :active="request()->routeIs('chat')">
-                        {{ __('Chat') }}
+                        {{ __('Chatroom') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -100,7 +100,8 @@
                         <x-slot name="content">
                             <!-- Account Management -->
                             <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('Manage Account') }}
+                                <!-- {{ __('Manage Account') }} -->
+                                {{ (auth()->user()->email) }}
                             </div>
 
                             <x-dropdown-link href="{{ route('profile.show') }}">
