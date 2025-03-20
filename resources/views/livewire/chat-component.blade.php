@@ -249,15 +249,11 @@
                                         class=""
                                         x-show="!isBeingEdited"
                                     >
-                                        <p class="text-gray-300">
-                                            {{ $message->content }}
-                                            
-                                            @if ($message->is_edited)
-                                                <span class="text-sm text-gray-600">
-                                                    (edited)
-                                                </span>
-                                            @endif
-                                        </p>
+                                        @if ($message->content)
+                                            <p class="text-gray-300">
+                                                {{ $message->content }}
+                                            </p>
+                                        @endif
 
                                         @foreach ($message->files ?? [] as $file)
                                             <!-- Image files -->
@@ -268,6 +264,12 @@
                                                 >
                                             @endif
                                         @endforeach
+
+                                        @if ($message->is_edited)
+                                            <span class="text-sm text-gray-600">
+                                                (edited)
+                                            </span>
+                                        @endif
                                     </div>
 
                                     <!-- Edit message mode -->
