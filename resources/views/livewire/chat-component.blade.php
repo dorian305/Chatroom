@@ -472,7 +472,7 @@
                 wire:model.live="searchUsers"
             >
             @if ($users->isEmpty())
-                <p class="">No users found for: {{ $searchUsers }}</p>
+                <p class="">No users found for: <strong>{{ $searchUsers }}</strong></p>
             @else
                 <ul class="">
                     @foreach ($users as $user)
