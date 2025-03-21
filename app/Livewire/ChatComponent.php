@@ -10,6 +10,7 @@ use App\Events\UserTyping;
 use App\Models\Message;
 use App\Models\User;
 use App\Rules\ActivityStatusRule;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -41,10 +42,20 @@ class ChatComponent extends Component
 
     public function updatedSearchUsers(): void
     {
-        $this->users = User::where('is_online', true)
-            ->where('name', 'like', "%{$this->searchUsers}%")
-            ->get();
+        $this->searchUsers = strtolower($this->searchUsers);
+
+        if ($this->searchUsers === '') {
+            $this->users = User::where('is_online', true)
+                ->get()
+                ->reject(fn ($user) => $user->id == $this->localUser->id)
+                ->prepend($this->localUser);
+        } else {
+            $this->users = User::where('is_online', '=', true)
+                ->whereRaw('LOWER(name) like ?', ["%{$this->searchUsers}%"])
+                ->get();
+        }
     }
+
 
     public function sendMessage(string $message): void
     {
@@ -283,8 +294,7 @@ class ChatComponent extends Component
         $this->updateUserStatus($this->localUser->id, true);
         $this->updateUserActivity($this->localUser->id, 'active');
 
-        $this->users = User::with(['messages'])
-            ->where('is_online', true)
+        $this->users = User::where('is_online', true)
             ->get()
             ->reject(fn ($user) => $user->id == $this->localUser->id)
             ->prepend($this->localUser);

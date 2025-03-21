@@ -25,11 +25,6 @@ class Message extends Model
         'is_edited' => 'boolean',
     ];
 
-    protected $with = [
-        'user',
-        'files',
-    ];
-
     protected $dispatchesEvents = [
         'deleting' => MessageRemoveChatUploadedFiles::class
     ];
