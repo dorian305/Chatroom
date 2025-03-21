@@ -10,7 +10,6 @@ use App\Events\UserTyping;
 use App\Models\Message;
 use App\Models\User;
 use App\Rules\ActivityStatusRule;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -65,8 +64,8 @@ class ChatComponent extends Component
                 'files' => $this->uploadedFiles
             ],
             [
-                'message' => ['required_without:file', 'nullable', 'string', 'max:5000'],
-                'files' => ['required_without:message', 'nullable', 'array'],
+                'message' => ['required_without:files', 'string', 'min:3', 'max:5000'],
+                'files' => ['nullable', 'array'],
                 'files.*' => ['file', 'max:10240'],
             ]
         )->validate();
