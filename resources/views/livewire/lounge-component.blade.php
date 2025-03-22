@@ -352,6 +352,7 @@
                     sendMessage() {
                         this.chatMessage = this.chatMessage.trim();
 
+                        if (this.chatMessage.length < 3 || this.chatMessage.length > 5000) return;
                         $wire.sendMessage(this.chatMessage);
                         
                         this.chatMessage = '';
