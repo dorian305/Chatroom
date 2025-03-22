@@ -17,7 +17,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class ChatComponent extends Component
+class LoungeComponent extends Component
 {
     use WithFileUploads;
 
@@ -304,6 +304,6 @@ class ChatComponent extends Component
 
     public function render()
     {
-        return view('livewire.chat-component');
+        return view('livewire.lounge-component');
     }
 }

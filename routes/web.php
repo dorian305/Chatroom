@@ -12,5 +12,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
          * Add views which require authorization before access.
          */
         Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
-        Route::get('/chatroom', fn () => view('chat'))->name('chat');
+        Route::get('/lounge', fn () => view('lounge'))->name('lounge');
     });
