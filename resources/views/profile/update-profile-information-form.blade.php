@@ -4,7 +4,7 @@
     </x-slot>
 
     <x-slot name="description">
-        {{ __('Update your account\'s profile information and email address.') }}
+        {{ __('Update your profile information') }}
     </x-slot>
 
     <x-slot name="form">
@@ -80,6 +80,13 @@
                     </p>
                 @endif
             @endif
+        </div>
+
+        <!-- Bio -->
+        <div class="col-span-6 sm:col-span-4">
+            <x-label for="bio" value="{{ __('Bio') }}" />
+            <x-input id="bio" type="text" class="mt-1 block w-full" wire:model="state.bio" autocomplete="bio" />
+            <x-input-error for="bio" class="mt-2" />
         </div>
     </x-slot>
 

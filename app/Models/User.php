@@ -33,6 +33,7 @@ class User extends Authenticatable
         'password',
         'is_online',
         'activity_status',
+        'bio',
     ];
 
     protected $dispatchesEvents = [
