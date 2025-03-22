@@ -239,8 +239,9 @@
                                         <p class="text-base">{{ $message->user->name }}</p>
                                         <p
                                             class="date-elem text-xs text-gray-400 mx-2"
-                                            data-created-at="{{ $message->created_at->toISOString() }}"
+                                            title="{{ $message->created_at->format('F j, Y, h:i:s A') }}"
                                             wire:ignore
+                                            data-created-at="{{ $message->created_at->toISOString() }}"
                                         ></p>
                                     </div>
 
