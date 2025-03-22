@@ -479,7 +479,7 @@
                 <ul class="">
                     @foreach ($users as $user)
                         <li
-                            class="flex items-center justify-between py-2"
+                            class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-800/50 hover:transition-colors"
                             wire:key="{{ $user->id }}"
                         >
                             <div class="flex flex-row items-center">
