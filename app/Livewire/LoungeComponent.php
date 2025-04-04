@@ -30,6 +30,29 @@ class LoungeComponent extends Component
     public string $searchUsers = '';
     public Collection $messages;
 
+    public function render()
+    {
+        return view('livewire.lounge-component');
+    }
+
+    public function mount(): void
+    {
+        $this->users = collect();
+        $this->messages = collect();
+        $this->localUser = auth()->user();
+
+        $this->updateUserStatus($this->localUser->id, true);
+        $this->updateUserActivity($this->localUser->id, 'active');
+
+        $this->users = User::where('is_online', true)
+            ->get()
+            ->reject(fn ($user) => $user->id == $this->localUser->id)
+            ->prepend($this->localUser);
+        $this->messages = Message::where('is_deleted', '=', false)
+            ->get();
+        $this->onlineUsersNumber = $this->users->count();
+    }
+
     public function updatedNewFileUploads(): void
     {
         $this->uploadedFiles = [
@@ -282,28 +305,5 @@ class LoungeComponent extends Component
         User::findOrFail($userId)->update([
             'is_online' => $online,
         ]);
-    }
-
-    public function mount(): void
-    {
-        $this->users = collect();
-        $this->messages = collect();
-        $this->localUser = auth()->user();
-
-        $this->updateUserStatus($this->localUser->id, true);
-        $this->updateUserActivity($this->localUser->id, 'active');
-
-        $this->users = User::where('is_online', true)
-            ->get()
-            ->reject(fn ($user) => $user->id == $this->localUser->id)
-            ->prepend($this->localUser);
-        $this->messages = Message::where('is_deleted', '=', false)
-            ->get();
-        $this->onlineUsersNumber = $this->users->count();
-    }
-
-    public function render()
-    {
-        return view('livewire.lounge-component');
     }
 }
