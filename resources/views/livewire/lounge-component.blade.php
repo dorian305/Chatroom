@@ -2,7 +2,7 @@
     class="flex items-center justify-center"
     x-data="{
         inactivityTime: 60000,
-        activityStatus: '{{ auth()->user()->activity_status }}',
+        activityStatus: 'active',
         inactivityTimer: null,
 
         resetInactivityTimer() {
@@ -21,7 +21,8 @@
             $wire.updateUserActivity({{ auth()->user()->id }}, this.activityStatus);
         },
     }"
-    x-init="resetInactivityTimer()"
+
+    x-init="resetInactivityTimer();"
 >
     <div class="w-full flex text-white rounded-lg">
 		
@@ -473,32 +474,31 @@
                 placeholder="Search users..."
                 wire:model.live="searchUsers"
             >
-            @if ($users->isEmpty())
+            @if (empty($users))
                 <p class="">No users found for: <strong>{{ $searchUsers }}</strong></p>
             @else
                 <ul class="">
                     @foreach ($users as $user)
                         <li
                             class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-800/50 hover:transition-colors"
-                            wire:key="{{ $user->id }}"
+                            wire:key="{{ $user['id'] }}"
                         >
                             <div class="flex flex-row items-center">
-                                
                                 <img
                                     class="size-8 rounded-full object-cover"
-                                    src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : $user->getDefaultProfilePictureUrl() }}"
+                                    src="{{ $user['profile_photo_path'] ? Storage::url($user['profile_photo_path']) : App\Models\User::findOrFail($user['id'])->getDefaultProfilePictureUrl() }}"
                                     alt=""
                                 >
                                 <span class="mx-2">
-                                    {{ $user->name }}
+                                    {{ $user['name'] }}
                                 </span>
                             </div>
 
                             <!-- Green button -->
                             <span
                                 class="w-2 h-2 rounded-full ml-2"
-                                title="{{ $user->activity_status }}"
-                                style="background-color: {{ $user->activity_status === 'active' ? 'rgb(34, 197, 94)' : 'rgb(254, 240, 138)' }};"
+                                title="{{ $user['activity_status'] }}"
+                                style="background-color: {{ $user['activity_status'] === 'active' ? 'rgb(34, 197, 94)' : 'rgb(254, 240, 138)' }};"
                             ></span>
                         </li>
                     @endforeach
@@ -511,9 +511,14 @@
         <script>
             // Websocket connection events
             Echo.join('lounge')
+                .here(users => {
+                    $wire.dispatchSelf('get-connected-users', {
+                        connectedUsers: users,
+                    });
+                })
                 .joining(user => {
                     $wire.dispatchSelf('user-connected', {
-                        userId: user.id,
+                        connectedUser: user,
                     });
 
                     toast(user.name + " has joined the chatroom", {
@@ -523,7 +528,7 @@
                 })
                 .leaving(user => {
                     $wire.dispatchSelf('user-disconnected', {
-                        userId: user.id,
+                        disconnectedUser: user,
                     });
 
                     toast(user.name + " has left the chatroom", {

@@ -13,12 +13,12 @@ class DeleteMessage implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public int $messageId;
-
     /**
      * Create a new event instance.
      */
-    public function __construct(int $messageId)
+    public function __construct(
+        public int $messageId,
+    )
     {
         Message::findOrFail($messageId)->delete();
 

@@ -13,21 +13,14 @@ class UserActivity implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public int $userId;
-    public string $activityStatus;
-
     /**
      * Create a new event instance.
      */
-    public function __construct(int $userId, ?string $activityStatus)
+    public function __construct(
+        public int $userId,
+        public ?string $activityStatus
+    )
     {
-        $user = User::findOrFail($userId);
-        $user->update([
-            'activity_status' => $activityStatus,
-        ]);
-
-        $this->userId = $user->id;
-        $this->activityStatus = $user->activity_status;
     }
 
     /**

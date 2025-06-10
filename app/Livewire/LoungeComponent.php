@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\ActivityStatusEnum;
 use App\Events\DeleteMessage;
 use App\Events\EditMessage;
 use App\Events\NewMessage;
@@ -9,7 +10,6 @@ use App\Events\UserActivity;
 use App\Events\UserTyping;
 use App\Models\Message;
 use App\Models\User;
-use App\Rules\ActivityStatusRule;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -25,7 +25,7 @@ class LoungeComponent extends Component
     public array $uploadedFiles = [];
     public array $usersCurrentlyTyping = [];
     public User $localUser;
-    public Collection $users;
+    public array $users = [];
     public int $onlineUsersNumber = 0;
     public string $searchUsers = '';
     public Collection $messages;
@@ -37,20 +37,16 @@ class LoungeComponent extends Component
 
     public function mount(): void
     {
-        $this->users = collect();
-        $this->messages = collect();
         $this->localUser = auth()->user();
-
-        $this->updateUserStatus($this->localUser->id, true);
-        $this->updateUserActivity($this->localUser->id, 'active');
-
-        $this->users = User::where('is_online', true)
-            ->get()
-            ->reject(fn ($user) => $user->id == $this->localUser->id)
-            ->prepend($this->localUser);
         $this->messages = Message::where('is_deleted', '=', false)
             ->get();
-        $this->onlineUsersNumber = $this->users->count();
+    }
+
+    #[On('get-connected-users')]
+    public function getConnectedUsers($connectedUsers)
+    {
+        $this->users = $connectedUsers;
+        $this->onlineUsersNumber = count($this->users);
     }
 
     public function updatedNewFileUploads(): void
@@ -156,16 +152,9 @@ class LoungeComponent extends Component
 
     public function updateUserActivity(int $userId, string $activityStatus): void
     {
-        Validator::make(
-            [
-                'userId' => $userId,
-                'activityStatus' => $activityStatus,
-            ],
-            [
-                'userId' => ['required', 'exists:users,id'],
-                'activityStatus' => ['required', new ActivityStatusRule()],
-            ],
-        )->validate();
+        if (!ActivityStatusEnum::tryFrom($activityStatus)) {
+            $activityStatus = 'away';
+        }
 
         UserActivity::dispatch(
             $userId,
@@ -248,13 +237,11 @@ class LoungeComponent extends Component
         $userId = $data['userId'];
         $activityStatus = $data['activityStatus'];
 
-        $this->users = $this->users->map(function ($user) use ($userId, $activityStatus) {
-            if ($user->id === $userId) {
-                $user->activity_status = $activityStatus;
-            }
+        foreach ($this->users as &$user) {
+            if ($user['id'] !== $userId) continue;
 
-            return $user;
-        });
+            $user['activity_status'] = $activityStatus;
+        }
     }
 
     #[On('echo-presence:lounge,UserTyping')]
@@ -279,31 +266,21 @@ class LoungeComponent extends Component
     }
 
     #[On('user-connected')]
-    public function userConnected($userId)
+    public function userConnected(array $connectedUser): void
     {
-        $connectedUser = User::findOrFail($userId);
-        $this->users = $this->users->push($connectedUser);
-        $this->onlineUsersNumber = $this->users->count();
+        $this->users[] = $connectedUser;
+        $this->onlineUsersNumber = count($this->users);
     }
 
     #[On('user-disconnected')]
-    public function userDisconnected($userId): void
+    public function userDisconnected(array $disconnectedUser): void
     {
-        $this->updateUserStatus($userId, false);
-
-        $disconnectedUser = User::findOrFail($userId);
-        $disconnectedUser->update([
-            'activity_status' => null,
-        ]);
-
-        $this->users = $this->users->reject(fn ($user) => $user->id === $disconnectedUser->id);
-        $this->onlineUsersNumber = $this->users->count();
-    }
-
-    public function updateUserStatus(int $userId, bool $online): void
-    {
-        User::findOrFail($userId)->update([
-            'is_online' => $online,
-        ]);
+        $this->users = array_filter(
+            $this->users,
+            function ($user) use ($disconnectedUser): bool {
+                return $user['id'] !== $disconnectedUser['id'];
+            }
+        );
+        $this->onlineUsersNumber = count($this->users);
     }
 }
