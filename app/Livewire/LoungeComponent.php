@@ -45,7 +45,14 @@ class LoungeComponent extends Component
     #[On('get-connected-users')]
     public function getConnectedUsers($connectedUsers)
     {
-        $this->users = $connectedUsers;
+        $users = collect($connectedUsers);
+        $localUser = $users->firstWhere('id', $this->localUser->id);
+        $otherUsers = $users->reject(fn($user) => $user['id'] === $this->localUser->id);
+        
+        $this->users = $localUser 
+            ? $otherUsers->prepend($localUser)->toArray()
+            : $otherUsers->toArray();
+            
         $this->onlineUsersNumber = count($this->users);
     }
 
