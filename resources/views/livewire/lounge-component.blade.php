@@ -510,7 +510,7 @@
     @script
         <script>
             // Websocket connection events
-            Echo.join('chatroom')
+            Echo.join('lounge')
                 .joining(user => {
                     $wire.dispatchSelf('user-connected', {
                         userId: user.id,

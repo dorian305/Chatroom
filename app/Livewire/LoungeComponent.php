@@ -207,7 +207,7 @@ class LoungeComponent extends Component
         }
     }
 
-    #[On('echo:chatroom,NewMessage')]
+    #[On('echo-presence:lounge,NewMessage')]
     public function newMessageReceived($data): void
     {
         $message = Message::findOrFail($data['message']['id']);
@@ -216,7 +216,7 @@ class LoungeComponent extends Component
         $this->dispatch('updated-messages');
     }
 
-    #[On('echo:chatroom,DeleteMessage')]
+    #[On('echo-presence:lounge,DeleteMessage')]
     public function deletedMessage($data): void
     {
         $this->messages = $this->messages->reject(fn ($msg): bool =>
@@ -226,7 +226,7 @@ class LoungeComponent extends Component
         $this->dispatch('updated-messages');
     }
 
-    #[On('echo:chatroom,EditMessage')]
+    #[On('echo-presence:lounge,EditMessage')]
     public function editedMessage($data): void
     {
         $messageId = $data['messageId'];
@@ -242,7 +242,7 @@ class LoungeComponent extends Component
             });
     }
 
-    #[On('echo:chatroom,UserActivity')]
+    #[On('echo-presence:lounge,UserActivity')]
     public function userActivityStatusUpdated($data): void
     {
         $userId = $data['userId'];
@@ -257,7 +257,7 @@ class LoungeComponent extends Component
         });
     }
 
-    #[On('echo:chatroom,UserTyping')]
+    #[On('echo-presence:lounge,UserTyping')]
     public function userIsTyping($data): void
     {
         $username = $data['username'];
