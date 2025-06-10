@@ -262,7 +262,7 @@
                                             @if (str_starts_with($file->file_type, 'image/'))
                                                 <img
                                                     class="rounded-lg my-2"
-                                                    src="{{ Storage::url($file->uploaded_file_path) }}"
+                                                    src="{{ asset("storage/{$file->uploaded_file_path}") }}"
                                                 >
                                             @endif
                                         @endforeach

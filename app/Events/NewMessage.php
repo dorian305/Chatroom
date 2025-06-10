@@ -35,7 +35,7 @@ class NewMessage implements ShouldBroadcastNow
             foreach ($uploadedFiles as $uploadedFile) {
                 ChatUploadedFile::create([
                     'message_id' => $this->message->id,
-                    'uploaded_file_path' => $uploadedFile->store('chat-uploads'),
+                    'uploaded_file_path' => $uploadedFile->store('chat-uploads', 'public'),
                     'file_type' => $uploadedFile->getMimeType(),
                 ]);
             }
