@@ -28,6 +28,7 @@ class LoungeComponent extends Component
     public array $users = [];
     public int $onlineUsersNumber = 0;
     public string $searchUsers = '';
+    public array $searchedUsersList = [];
     public Collection $messages;
 
     public function render()
@@ -67,18 +68,15 @@ class LoungeComponent extends Component
 
     public function updatedSearchUsers(): void
     {
-        $this->searchUsers = strtolower($this->searchUsers);
-
-        if ($this->searchUsers === '') {
-            $this->users = User::where('is_online', true)
-                ->get()
-                ->reject(fn ($user) => $user->id == $this->localUser->id)
-                ->prepend($this->localUser);
-        } else {
-            $this->users = User::where('is_online', '=', true)
-                ->whereRaw('LOWER(name) like ?', ["%{$this->searchUsers}%"])
-                ->get();
-        }
+        $this->searchedUsersList = collect($this->users)
+            ->filter(function ($user): bool {
+                return str_contains(
+                    strtolower($user['name']),
+                    strtolower($this->searchUsers)
+                );
+            })
+            ->values()
+            ->toArray();
     }
 
 

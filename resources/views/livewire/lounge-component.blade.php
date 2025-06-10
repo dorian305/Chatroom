@@ -474,11 +474,16 @@
                 placeholder="Search users..."
                 wire:model.live="searchUsers"
             >
-            @if (empty($users))
+            
+            @php
+                $displayUsers = $searchUsers === '' ? $users : $searchedUsersList;
+            @endphp
+            
+            @if (empty($displayUsers) && $searchUsers !== '')
                 <p class="">No users found for: <strong>{{ $searchUsers }}</strong></p>
             @else
                 <ul class="">
-                    @foreach ($users as $user)
+                    @foreach ($displayUsers as $user)
                         <li
                             class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-800/50 hover:transition-colors"
                             wire:key="{{ $user['id'] }}"
@@ -494,7 +499,6 @@
                                 </span>
                             </div>
 
-                            <!-- Green button -->
                             <span
                                 class="w-2 h-2 rounded-full ml-2"
                                 title="{{ $user['activity_status'] }}"
