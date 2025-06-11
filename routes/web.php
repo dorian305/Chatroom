@@ -13,4 +13,5 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
          */
         Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
         Route::get('/lounge', fn () => view('lounge'))->name('lounge');
+        Route::get('/online-users', fn () => view('online-users'))->name('online.users');
     });
