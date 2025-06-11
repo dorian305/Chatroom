@@ -467,7 +467,7 @@
 
         <!-- Users List -->
         <aside class="w-1/6 ml-10 rounded-lg">
-            <h2 class="text-xl font-semibold text-blue-500 mb-4">Online users ({{ $onlineUsersNumber }})</h2>
+            <h2 class="text-xl font-semibold text-blue-500 mb-4">Connected users ({{ $onlineUsersNumber }})</h2>
             <input
                 type="text"
                 class="mb-4 p-2 w-full bg-inherit rounded-lg border-0 text-gray-200"
