@@ -1,5 +1,6 @@
 <div
     x-data="{
+        localUserId: {{ auth()->user()->id }},
         users: [],
         search: '',
         loading: true,
@@ -67,8 +68,17 @@
                 class="w-32 h-32 rounded-full object-cover"
                 loading="lazy"
                 />
-                <p class="text-lg font-medium text-white mt-4" x-text="user.name"></p>
+
+                <p class="text-lg font-medium text-white mt-4 flex items-baseline">
+                <!-- Always show the name -->
+                <span x-text="user.name"></span>
+
+                <!-- Conditionally render the “(you)” with its own styling -->
+                <template x-if="user.id === localUserId">
+                    <span class="text-sm text-gray-400 ml-2">(you)</span>
+                </template>
+                </p>
             </div>
-        </template>
+            </template>
     </div>
 </div>
