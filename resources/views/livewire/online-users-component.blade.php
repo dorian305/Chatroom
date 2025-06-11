@@ -32,11 +32,6 @@
     "
     class="space-y-4"
 >
-    {{-- Header --}}
-    <h2 class="text-xl font-semibold text-blue-400">
-        Online Users (<span x-text="users.length"></span>)
-        <span x-show="loading" class="text-sm text-gray-400">Loading...</span>
-    </h2>
 
     {{-- Search --}}
     <input
