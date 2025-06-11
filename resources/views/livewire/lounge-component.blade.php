@@ -491,7 +491,7 @@
                             <div class="flex flex-row items-center">
                                 <img
                                     class="size-8 rounded-full object-cover"
-                                    src="{{ $user['profile_photo_path'] ? Storage::url($user['profile_photo_path']) : App\Models\User::findOrFail($user['id'])->getDefaultProfilePictureUrl() }}"
+                                    src="{{ $user['profile_photo_url'] }}"
                                     alt=""
                                 >
                                 <span class="mx-2">
