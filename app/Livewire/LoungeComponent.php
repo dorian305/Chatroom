@@ -20,16 +20,16 @@ use Livewire\WithFileUploads;
 class LoungeComponent extends Component
 {
     use WithFileUploads;
-
-    public array $newFileUploads = [];
-    public array $uploadedFiles = [];
-    public array $usersCurrentlyTyping = [];
+    
+    public Collection $messages;
     public User $localUser;
     public array $users = [];
     public int $onlineUsersNumber = 0;
+    public array $usersCurrentlyTyping = [];
     public string $searchUsers = '';
     public array $searchedUsersList = [];
-    public Collection $messages;
+    public array $newFileUploads = [];
+    public array $uploadedFiles = [];
 
     public function render()
     {
