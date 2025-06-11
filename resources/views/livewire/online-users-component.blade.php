@@ -33,7 +33,6 @@
     class="space-y-4"
 >
 
-    {{-- Search --}}
     <input
         type="text"
         x-model="search"
@@ -47,34 +46,28 @@
         </p>
     </template>
 
-    {{-- Users Grid --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center">
         <template x-if="loading">
-            <p class="col-span-full text-center text-gray-400">
+            <p class="text-gray-400">
                 Loading online users...
             </p>
         </template>
         
         <template x-if="!loading && filtered.length === 0">
-            <p class="col-span-full text-center text-gray-400">
+            <p class="col-span-full text-gray-400">
                 <span x-show="search.trim()">No users found matching your search.</span>
             </p>
         </template>
 
         <template x-for="user in filtered" :key="user.id">
-            <div class="bg-gray-800 hover:bg-gray-700 transition-colors rounded-lg overflow-hidden shadow-md">
-                {{-- Profile Photo --}}
+            <div class="overflow-hidden flex flex-col items-center text-center p-4">
                 <img
-                    :src="user.profile_photo_url"
-                    :alt="`${user.name}'s avatar`"
-                    class="w-full h-32 object-cover"
-                    loading="lazy"
+                :src="user.profile_photo_url"
+                :alt="`${user.name}'s avatar`"
+                class="w-32 h-32 rounded-full object-cover"
+                loading="lazy"
                 />
-
-                {{-- Name & Status --}}
-                <div class="p-4 flex flex-col items-center text-center">
-                    <p class="text-lg font-medium text-white mb-1" x-text="user.name"></p>
-                </div>
+                <p class="text-lg font-medium text-white mt-4" x-text="user.name"></p>
             </div>
         </template>
     </div>
